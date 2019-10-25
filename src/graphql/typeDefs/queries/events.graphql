@@ -1,5 +1,0 @@
-# import Message from '../dataTypes/message.graphql'
-
-type Query {
-  events(message: String!): Message!
-}

@@ -1,0 +1,26 @@
+"Venue Information"
+type Venue {
+  "The THAT unique id for a given event."
+  id: ID!
+
+  "Name of the location"
+  name: String!
+
+  "Website"
+  webSite: URL!
+
+  "Address line one."
+  address: String!
+
+  "Address line two."
+  addressLineTwo: String
+
+  "City"
+  city: String!
+
+  "State"
+  state: String!
+
+  "Zip"
+  zip: PostalCode!
+}

@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import 'dotenv/config';
+import { Firestore } from '@google-cloud/firestore';
 import connect from 'connect';
 import uuid from 'uuid/v4';
 import * as Sentry from '@sentry/node';
@@ -11,6 +12,7 @@ const api = connect();
 const createConfig = () => ({
   dataSources: {
     sentry: Sentry,
+    firestore: new Firestore(),
   },
 });
 
@@ -18,7 +20,6 @@ const useSentry = async (req, res, next) => {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.THAT_ENVIRONMENT,
-    debug: true,
   });
 
   Sentry.addBreadcrumb({

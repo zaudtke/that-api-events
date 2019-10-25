@@ -1,0 +1,34 @@
+# import Venue from './venue.graphql'
+
+"Everything you've ever wanted about THAT Events."
+type Event {
+  "The THAT unique id for a given event."
+  id: ID!
+
+  "The event friendly name"
+  name: String!
+
+  "A short description about this event"
+  description: String
+
+  "Starting day of the event."
+  startDate: DateTime
+
+  "Ending day of the event."
+  endDate: DateTime
+
+  "The year this event takes place in."
+  year: Int
+
+  "The location where this event will take place."
+  venue: Venue
+
+  "Main contact email address."
+  email: EmailAddress
+
+  "Main phone number."
+  phoneNumber: PhoneNumber
+
+  "Website"
+  webSite: URL!
+}

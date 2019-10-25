@@ -1,1 +1,4 @@
-# import Query.* from './queries/events.graphql'
+# import * from './scalars.graphql'
+
+# import Query.* from './queries/event.graphql'
+# import Mutation.* from './mutations/event.graphql'
