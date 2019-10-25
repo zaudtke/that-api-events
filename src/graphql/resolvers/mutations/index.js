@@ -1,5 +1,5 @@
-// import mutateActivity from './activity/mutateActivity';
+import mutateEvent from './mutateEvent';
 
-// export default {
-//   ...mutateActivity,
-// };
+export default {
+  ...mutateEvent,
+};
