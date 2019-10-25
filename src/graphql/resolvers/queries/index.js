@@ -1,5 +1,5 @@
-import echo from './echo';
+import events from './events';
 
 export default {
-  ...echo,
+  ...events,
 };
