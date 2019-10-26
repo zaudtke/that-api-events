@@ -28,10 +28,12 @@ const event = dbInstance => {
   const getAll = async () => {
     const { docs } = await eventsCol.get();
 
-    return docs.map(d => ({
+    const results = docs.map(d => ({
       id: d.id,
       ...d.data(),
     }));
+
+    return results;
   };
 
   return { create, getAll, get };

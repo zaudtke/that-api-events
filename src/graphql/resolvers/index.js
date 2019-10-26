@@ -1,10 +1,12 @@
-import { resolvers } from 'graphql-scalars';
+import { resolvers as graphScalars } from 'graphql-scalars';
 
+import customScalars from './scalars/date';
 import queries from './queries';
 import mutations from './mutations';
 
 const createServer = {
-  ...resolvers,
+  ...graphScalars,
+  ...customScalars,
   Query: {
     ...queries,
   },
