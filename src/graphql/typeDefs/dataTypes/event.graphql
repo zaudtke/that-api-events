@@ -1,4 +1,5 @@
 # import Venue from './venue.graphql'
+# import Milestone from './milestone.graphql'
 
 "Everything you've ever wanted about THAT Events."
 type Event {
@@ -33,5 +34,8 @@ type Event {
   phoneNumber: PhoneNumber
 
   "Website"
-  webSite: URL
+  website: URL
+
+  "List of this event's milestones"
+  milestones: [Milestone]
 }

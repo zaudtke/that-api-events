@@ -1,0 +1,6 @@
+type Milestone {
+  id: ID!
+  title: String!
+  description: String
+  dueDate: DateTime
+}

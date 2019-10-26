@@ -3,7 +3,11 @@ const event = dbInstance => {
   const eventsCol = dbInstance.collection(collectionName);
 
   const create = async newEvent => {
-    const newDocument = await eventsCol.add(newEvent);
+    const scrubbedEvent = newEvent;
+
+    if (newEvent.website) scrubbedEvent.website = newEvent.website.href;
+
+    const newDocument = await eventsCol.add(scrubbedEvent);
 
     return {
       id: newDocument.id,
