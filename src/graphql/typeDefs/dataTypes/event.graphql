@@ -16,10 +16,10 @@ type Event {
   description: String
 
   "Starting day of the event."
-  startDate: DateTime
+  startDate: Date
 
   "Ending day of the event."
-  endDate: DateTime
+  endDate: Date
 
   "The year this event takes place in."
   year: Int
