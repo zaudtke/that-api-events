@@ -4,6 +4,9 @@ input EventInput {
   "The event friendly name"
   name: String!
 
+  "What is this, in a few words?"
+  slogan: String!
+
   "A short description about this event"
   description: String
 
