@@ -3,3 +3,4 @@ scalar PhoneNumber
 scalar URL
 scalar PostalCode
 scalar EmailAddress
+scalar Date

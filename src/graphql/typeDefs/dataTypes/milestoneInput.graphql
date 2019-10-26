@@ -1,5 +1,5 @@
 input MilestoneInput {
   title: String!
   description: String
-  dueDate: DateTime!
+  dueDate: Date!
 }
