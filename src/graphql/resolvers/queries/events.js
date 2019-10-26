@@ -1,10 +1,8 @@
-import uuid from 'uuid/v4';
+import eventStore from '../../../dataSources/cloudFirestore/event';
 
 const resolvers = {
-  events: async (parent, { message }, { dataSources }) => ({
-    id: uuid(),
-    message: `resolver got: ${message}`,
-  }),
+  events: async (parent, args, { dataSources }) =>
+    eventStore(dataSources.firestore).getAll(),
 };
 
 export default resolvers;

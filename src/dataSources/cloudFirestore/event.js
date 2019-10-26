@@ -1,19 +1,24 @@
 const event = dbInstance => {
+  const eventsCol = dbInstance.collection('events');
   const create = async newEvent => {
-    const eventsCol = dbInstance.collection('events');
     const newDocument = await eventsCol.add(newEvent);
 
-    const returnDoc = {
+    return {
       id: newDocument.id,
       ...newEvent,
     };
-
-    console.log('return doc', returnDoc);
-
-    return returnDoc;
   };
 
-  return { create };
+  const getAll = async () => {
+    const { docs } = await eventsCol.get();
+
+    return docs.map(d => ({
+      id: d.id,
+      ...d.data(),
+    }));
+  };
+
+  return { create, getAll };
 };
 
 export default event;
