@@ -2,12 +2,17 @@
 import 'dotenv/config';
 import { Firestore } from '@google-cloud/firestore';
 import connect from 'connect';
+import responseTime from 'response-time';
 import uuid from 'uuid/v4';
 import * as Sentry from '@sentry/node';
 
 import apolloGraphServer from './graphql';
 
 const api = connect();
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.THAT_ENVIRONMENT,
+});
 
 const createConfig = () => ({
   dataSources: {
@@ -16,12 +21,7 @@ const createConfig = () => ({
   },
 });
 
-const useSentry = async (req, res, next) => {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.THAT_ENVIRONMENT,
-  });
-
+const sentryMark = (req, res, next) => {
   Sentry.addBreadcrumb({
     category: 'that-api-events',
     message: 'init',
@@ -54,7 +54,7 @@ const createUserContext = (req, res, next) => {
   next();
 };
 
-const apiHandler = async (req, res) => {
+const apiHandler = (req, res) => {
   try {
     const graphServer = apolloGraphServer(createConfig());
     const graphApi = graphServer.createHandler({
@@ -80,6 +80,7 @@ const apiHandler = async (req, res) => {
  * This is your api handler for your serverless function
  */
 export const graphEndpoint = api
-  .use(useSentry)
+  .use(responseTime())
+  .use(sentryMark)
   .use(createUserContext)
   .use(apiHandler);
