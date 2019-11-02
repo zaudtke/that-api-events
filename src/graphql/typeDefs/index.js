@@ -1,5 +1,11 @@
-import { importSchema } from 'graphql-import';
+// import { importSchema } from 'graphql-import';
 
-const typeDefs = () => importSchema(`${__dirname}/schema.graphql`);
+// const typeDefs = () => importSchema(`${__dirname}/schema.graphql`);
 
-export default typeDefs();
+// export default typeDefs();
+
+import types from './types.gql';
+
+export default {
+  ...types,
+};

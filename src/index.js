@@ -79,6 +79,7 @@ const apiHandler = (req, res) => {
 
     graphApi(req, res);
   } catch (e) {
+    if (process.env.NODE_ENV === 'development') console.error(e);
     Sentry.captureException(e);
     res
       .set('Content-Type', 'application/json')
