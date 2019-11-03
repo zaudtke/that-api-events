@@ -42,12 +42,22 @@ const sentryMark = (req, res, next) => {
  *
  */
 const createUserContext = (req, res, next) => {
+  const enableMocking = () => {
+    if (!req.headers['that-enable-mocks']) return false;
+
+    const headerValues = req.headers['that-enable-mocks'].split(',');
+    const mocks = headerValues.map(i => i.trim().toUpperCase());
+
+    return !!mocks.includes('EVENTS');
+  };
+
   req.userContext = {
     locale: req.headers.locale,
     authToken: req.headers.authorization,
-    correlationId: req.headers['correlation-id']
-      ? req.headers['correlation-id']
+    correlationId: req.headers['that-correlation-id']
+      ? req.headers['that-correlation-id']
       : uuid(),
+    enableMocking: enableMocking(),
     sentry: Sentry,
   };
 
@@ -56,7 +66,10 @@ const createUserContext = (req, res, next) => {
 
 const apiHandler = (req, res) => {
   try {
-    const graphServer = apolloGraphServer(createConfig());
+    const graphServer = apolloGraphServer(
+      createConfig(),
+      req.userContext.enableMocking,
+    );
     const graphApi = graphServer.createHandler({
       cors: {
         origin: '*',
