@@ -1,5 +1,5 @@
 "Venue Information"
-type Venue {
+type Venue @key(fields: "id") {
   "The THAT unique id for a given event."
   id: ID!
 

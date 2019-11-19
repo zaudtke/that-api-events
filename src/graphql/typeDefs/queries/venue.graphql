@@ -1,5 +1,3 @@
-# import Venue from '../dataTypes/venue.graphql'
-
 type Query {
   venue(id: ID!): Venue
   venues: [Venue]

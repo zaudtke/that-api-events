@@ -1,6 +1,3 @@
-# import VenueInput from './venueInput.graphql'
-# import MilestoneInput from './milestoneInput.graphql'
-
 input EventInput {
   "The event friendly name"
   name: String!

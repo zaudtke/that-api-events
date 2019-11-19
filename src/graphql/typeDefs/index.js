@@ -4,8 +4,11 @@
 
 // export default typeDefs();
 
-import types from './types.gql';
+import path from 'path';
+import { fileLoader, mergeTypes } from 'merge-graphql-schemas';
 
-export default {
-  ...types,
-};
+const typesArray = fileLoader(path.join(__dirname, './**/*.graphql'), {
+  recursive: true,
+});
+
+export default mergeTypes(typesArray, { all: true });

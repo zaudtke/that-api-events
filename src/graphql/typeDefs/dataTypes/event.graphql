@@ -1,8 +1,5 @@
-# import Venue from './venue.graphql'
-# import Milestone from './milestone.graphql'
-
 "Everything you've ever wanted about THAT Events."
-type Event {
+type Event @key(fields: "id") {
   "The THAT unique id for a given event."
   id: ID!
 
