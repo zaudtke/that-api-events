@@ -1,5 +1,3 @@
-# import Event from '../dataTypes/event.graphql'
-
 type Query {
   event(id: ID!): Event
   events: [Event]

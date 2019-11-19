@@ -1,6 +1,3 @@
-# import Event from '../dataTypes/event.graphql'
-# import EventInput from '../dataTypes/eventInput.graphql'
-
 type Mutation {
   createEvent(event: EventInput!): Event
 }
