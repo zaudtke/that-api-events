@@ -5,7 +5,7 @@ import connect from 'connect';
 import responseTime from 'response-time';
 import uuid from 'uuid/v4';
 import * as Sentry from '@sentry/node';
-
+import cors from 'cors';
 import apolloGraphServer from './graphql';
 
 const api = connect();
@@ -70,12 +70,7 @@ const apiHandler = (req, res) => {
       createConfig(),
       req.userContext.enableMocking,
     );
-    const graphApi = graphServer.createHandler({
-      cors: {
-        origin: '*',
-        credentials: true,
-      },
-    });
+    const graphApi = graphServer.createHandler();
 
     graphApi(req, res);
   } catch (e) {
@@ -95,6 +90,7 @@ const apiHandler = (req, res) => {
  */
 export const graphEndpoint = api
   .use(responseTime())
+  .use(cors())
   .use(sentryMark)
   .use(createUserContext)
   .use(apiHandler);
