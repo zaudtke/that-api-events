@@ -24,8 +24,9 @@ const typeDefs = gql`
  *
  *     createGateway(userContext)
  */
-const createServer = ({ dataSources, ...rest }, enableMocking = false) => {
+const createServer = ({ dataSources }, enableMocking = false) => {
   let schema = {};
+  const { logger } = dataSources;
 
   if (!enableMocking) {
     schema = buildFederatedSchema([{ typeDefs, resolvers }]);
@@ -59,6 +60,8 @@ const createServer = ({ dataSources, ...rest }, enableMocking = false) => {
     }),
 
     formatError: err => {
+      logger.warn('graphql error', err);
+
       dataSources.sentry.captureException(err);
       return err;
     },
