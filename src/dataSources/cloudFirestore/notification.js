@@ -35,7 +35,7 @@ const event = (dbInstance, logger) => {
       `${collectionName}/${eventId}/${subCollectionName}/${notificationId}`,
     );
 
-    return documentRef.set(notification).then(res => ({
+    return documentRef.update(notification).then(res => ({
       id: notificationId,
       ...notification,
     }));

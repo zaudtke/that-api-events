@@ -42,7 +42,7 @@ const event = (dbInstance, logger) => {
 
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
 
-    return docRef.set(eventInput).then(res => ({
+    return docRef.update(eventInput).then(res => ({
       id,
       ...eventInput,
     }));
