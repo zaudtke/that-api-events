@@ -1,5 +1,7 @@
-import events from './events';
+import event from './event';
+import notification from './notification';
 
 export default {
-  ...events,
+  ...event,
+  ...notification,
 };
