@@ -38,14 +38,19 @@ const event = (dbInstance, logger) => {
   };
 
   const update = (id, eventInput) => {
-    logger.debug(`updating event: ${id}`);
+    const scrubbedEvent = eventInput;
+    if (eventInput.website) scrubbedEvent.website = eventInput.website.href;
 
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
 
-    return docRef.update(eventInput).then(res => ({
-      id,
-      ...eventInput,
-    }));
+    return docRef.update(eventInput).then(res => {
+      logger.debug(`updated event: ${id}`);
+
+      return {
+        id,
+        ...eventInput,
+      };
+    });
   };
 
   return { create, getAll, get, update };
