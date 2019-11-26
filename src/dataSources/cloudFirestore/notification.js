@@ -3,13 +3,16 @@ const subCollectionName = 'notifications';
 
 const event = (dbInstance, logger) => {
   const create = (eventId, notification) => {
+    const scrubbedNotification = notification;
+    if (notification.link) scrubbedNotification.link = notification.link.href;
+
     const ref = dbInstance
       .doc(`${collectionName}/${eventId}`)
       .collection(subCollectionName);
 
-    return ref.add(notification).then(doc => ({
+    return ref.add(scrubbedNotification).then(doc => ({
       id: doc.id,
-      ...notification,
+      ...scrubbedNotification,
     }));
   };
 
@@ -29,15 +32,18 @@ const event = (dbInstance, logger) => {
   };
 
   const update = (eventId, notificationId, notification) => {
+    const scrubbedNotification = notification;
+    if (notification.link) scrubbedNotification.link = notification.link.href;
+
     logger.debug(`updating event ${eventId} notification: ${notificationId}`);
 
     const documentRef = dbInstance.doc(
       `${collectionName}/${eventId}/${subCollectionName}/${notificationId}`,
     );
 
-    return documentRef.update(notification).then(res => ({
+    return documentRef.update(scrubbedNotification).then(res => ({
       id: notificationId,
-      ...notification,
+      ...scrubbedNotification,
     }));
   };
 

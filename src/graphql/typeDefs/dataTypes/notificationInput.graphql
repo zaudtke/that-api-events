@@ -13,4 +13,7 @@ input NotificationInput {
 
   "a longer more detalied message for the notification"
   message: String!
+
+  "a link to where you can get more information about this notification"
+  link: Url
 }
