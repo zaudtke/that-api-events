@@ -18,6 +18,9 @@ type Notification {
   "a longer more detalied message for the notification"
   message: String!
 
+  "action text used for a link button"
+  linkText: String
+
   "a link to where you can get more information about this notification"
-  link: URL!
+  link: URL
 }
