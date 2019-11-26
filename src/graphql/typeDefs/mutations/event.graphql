@@ -1,3 +1,4 @@
 type Mutation {
   createEvent(event: EventInput!): Event
+  updateEvent(id: ID!, event: EventInput!): Event
 }
