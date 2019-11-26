@@ -1,0 +1,16 @@
+input NotificationInput {
+  "a boolean telling if this notficatoin message should be featured"
+  shouldFeature: Boolean!
+
+  "the starting date this notifcaiton should be displayed"
+  startDate: Date!
+
+  "the date at which this notification expires"
+  endDate: Date!
+
+  "a short sentence about the notication"
+  title: String!
+
+  "a longer more detalied message for the notification"
+  message: String!
+}

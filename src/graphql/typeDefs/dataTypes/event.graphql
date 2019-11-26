@@ -35,4 +35,7 @@ type Event @key(fields: "id") {
 
   "List of this event's milestones"
   milestones: [Milestone]
+
+  "List of this event's notifications"
+  notifications: [Notification]
 }

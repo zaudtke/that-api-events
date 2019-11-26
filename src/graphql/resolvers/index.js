@@ -4,6 +4,7 @@ import customScalars from './scalars/date';
 import queries from './queries';
 import mutations from './mutations';
 import federation from './federation';
+import fieldResolvers from './fieldResolvers';
 
 const createServer = {
   ...graphScalars,
@@ -15,6 +16,7 @@ const createServer = {
   Mutation: {
     ...mutations,
   },
+  ...fieldResolvers,
 };
 
 export default createServer;
