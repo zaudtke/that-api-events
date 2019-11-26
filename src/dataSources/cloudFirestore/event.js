@@ -1,4 +1,4 @@
-const event = dbInstance => {
+const event = (dbInstance, logger) => {
   const collectionName = 'events';
   const eventsCol = dbInstance.collection(collectionName);
 
@@ -8,6 +8,7 @@ const event = dbInstance => {
     if (newEvent.website) scrubbedEvent.website = newEvent.website.href;
 
     const newDocument = await eventsCol.add(scrubbedEvent);
+    logger.debug(`created new event: ${newDocument.id}`);
 
     return {
       id: newDocument.id,
@@ -36,7 +37,18 @@ const event = dbInstance => {
     return results;
   };
 
-  return { create, getAll, get };
+  const update = (id, eventInput) => {
+    logger.debug(`updating event: ${id}`);
+
+    const docRef = dbInstance.doc(`${collectionName}/${id}`);
+
+    return docRef.set(eventInput).then(res => ({
+      id,
+      ...eventInput,
+    }));
+  };
+
+  return { create, getAll, get, update };
 };
 
 export default event;
