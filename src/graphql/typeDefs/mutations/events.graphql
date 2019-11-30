@@ -1,0 +1,5 @@
+type EventsMutation {
+  create(event: EventInput!): Event!
+  delete: ID
+  update: EventMutation
+}

@@ -1,14 +1,7 @@
-type Mutation {
-  createNotification(
-    eventId: ID!
-    notification: NotificationInput!
-  ): Notification
-
-  updateNotification(
+type NotificationMutation {
+  notficaiton(
     eventId: ID!
     notificationId: ID!
     notification: NotificationInput!
-  ): Notification
-
-  removeNotification(eventId: ID!, notificationId: ID!): ID
+  ): Notification!
 }

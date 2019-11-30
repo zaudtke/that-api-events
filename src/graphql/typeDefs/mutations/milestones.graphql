@@ -1,0 +1,5 @@
+type MilestonesMutation {
+  create: Milestone!
+  delete: ID
+  update: MilestoneMutation
+}
