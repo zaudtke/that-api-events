@@ -2,5 +2,4 @@ type EventMutation {
   event(id: ID!, event: EventInput!): Event!
   notifications: NotificationsMutation
   milestones: MilestonesMutation
-  venues: VenuesMutation
 }
