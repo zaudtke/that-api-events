@@ -3,16 +3,15 @@ import eventStore from '../../../dataSources/cloudFirestore/event';
 
 export const fieldResolvers = {
   EventMutation: {
-    event: async (
-      parent,
-      { id, event },
+    update: async (
+      { eventId },
+      { event },
       { dataSources: { firestore, logger } },
     ) => {
       logger.debug('EventMutation.event called.');
-      return eventStore(firestore, logger).update(id, event);
+      return eventStore(firestore, logger).update(eventId, event);
     },
-    notifications: () => ({}),
-    milestones: () => ({}),
-    venues: () => ({}),
+    notifications: ({ eventId }) => ({ eventId }),
+    milestones: ({ eventId }) => ({ eventId }),
   },
 };

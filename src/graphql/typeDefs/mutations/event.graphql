@@ -1,5 +1,5 @@
 type EventMutation {
-  event(id: ID!, event: EventInput!): Event!
+  update(event: EventUpdateInput!): Event!
   notifications: NotificationsMutation
   milestones: MilestonesMutation
 }

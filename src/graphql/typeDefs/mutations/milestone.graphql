@@ -1,3 +1,3 @@
 type MilestoneMutation {
-  milestone: Milestone!
+  update(milestone: MilestoneUpdateInput!): Milestone!
 }

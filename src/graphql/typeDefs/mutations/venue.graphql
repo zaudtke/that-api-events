@@ -1,3 +1,3 @@
 type VenueMutation {
-  venue: Venue!
+  update(venue: VenueUpdateInput!): Venue!
 }

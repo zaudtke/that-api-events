@@ -1,5 +1,5 @@
 type NotificationsMutation {
-  create(eventId: ID!, notification: NotificationInput!): Notification!
-  delete(eventId: ID!, notificationId: ID!): ID
-  update: NotificationMutation
+  create(notification: NotificationCreateInput!): Notification!
+  delete(id: ID!): ID
+  notification(id: ID!): NotificationMutation
 }

@@ -2,6 +2,13 @@
 
 export const fieldResolvers = {
   VenueMutation: {
-    venue: () => ({}),
+    update: (
+      { venueId },
+      { venue },
+      { dataSources: { firestore, logger } },
+    ) => {
+      logger.debug('VenueMutation.update called.');
+      throw new Error('Not implemented yet.');
+    },
   },
 };
