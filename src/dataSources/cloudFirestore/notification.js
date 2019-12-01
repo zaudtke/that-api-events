@@ -3,9 +3,6 @@ const subCollectionName = 'notifications';
 
 const event = (dbInstance, logger) => {
   const create = (eventId, notification) => {
-    console.log('TCL: create -> notification', notification);
-    console.log('TCL: create -> eventId', eventId);
-
     const scrubbedNotification = notification;
     if (notification.link) scrubbedNotification.link = notification.link.href;
 

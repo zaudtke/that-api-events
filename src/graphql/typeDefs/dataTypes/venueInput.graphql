@@ -4,13 +4,13 @@ input VenueCreateInput {
   name: String!
 
   "Website"
-  webSite: URL!
+  website: URL!
 
   "Address line one."
   address: String!
 
   "Address line two."
-  addressLineTwo: String!
+  addressLineTwo: String
 
   "City"
   city: String!
@@ -28,7 +28,7 @@ input VenueUpdateInput {
   name: String
 
   "Website"
-  webSite: URL
+  website: URL
 
   "Address line one."
   address: String

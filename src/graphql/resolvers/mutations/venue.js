@@ -1,14 +1,16 @@
 /* eslint-disable import/prefer-default-export */
+import venueStore from '../../../dataSources/cloudFirestore/venue';
 
 export const fieldResolvers = {
   VenueMutation: {
-    update: (
+    update: async (
       { venueId },
       { venue },
       { dataSources: { firestore, logger } },
     ) => {
       logger.debug('VenueMutation.update called.');
-      throw new Error('Not implemented yet.');
+
+      return venueStore(firestore, logger).update(venueId, venue);
     },
   },
 };
