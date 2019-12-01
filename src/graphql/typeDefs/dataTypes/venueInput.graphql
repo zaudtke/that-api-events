@@ -1,5 +1,29 @@
 "New Venue Information"
-input VenueInput {
+input VenueCreateInput {
+  "Name of the location"
+  name: String!
+
+  "Website"
+  webSite: URL!
+
+  "Address line one."
+  address: String!
+
+  "Address line two."
+  addressLineTwo: String!
+
+  "City"
+  city: String!
+
+  "State"
+  state: String!
+
+  "Zip"
+  zip: PostalCode!
+}
+
+"New Venue Information"
+input VenueUpdateInput {
   "Name of the location"
   name: String
 

@@ -1,4 +1,5 @@
-type Mutation {
-  createEvent(event: EventInput!): Event
-  updateEvent(id: ID!, event: EventInput!): Event
+type EventMutation {
+  update(event: EventUpdateInput!): Event!
+  notifications: NotificationsMutation
+  milestones: MilestonesMutation
 }

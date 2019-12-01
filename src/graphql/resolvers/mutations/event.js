@@ -1,17 +1,17 @@
+/* eslint-disable import/prefer-default-export */
 import eventStore from '../../../dataSources/cloudFirestore/event';
 
-const resolvers = {
-  createEvent: async (
-    parent,
-    { event },
-    { dataSources: { firestore, logger } },
-  ) => eventStore(firestore, logger).create(event),
-
-  updateEvent: async (
-    parent,
-    { id, event },
-    { dataSources: { firestore, logger } },
-  ) => eventStore(firestore, logger).update(id, event),
+export const fieldResolvers = {
+  EventMutation: {
+    update: async (
+      { eventId },
+      { event },
+      { dataSources: { firestore, logger } },
+    ) => {
+      logger.debug('EventMutation.event called.');
+      return eventStore(firestore, logger).update(eventId, event);
+    },
+    notifications: ({ eventId }) => ({ eventId }),
+    milestones: ({ eventId }) => ({ eventId }),
+  },
 };
-
-export default resolvers;

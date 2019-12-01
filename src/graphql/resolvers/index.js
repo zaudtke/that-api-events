@@ -1,22 +1,25 @@
 import { resolvers as graphScalars } from 'graphql-scalars';
 
 import customScalars from './scalars/date';
-import queries from './queries';
-import mutations from './mutations';
+import queries, { fieldResolvers as qFieldResolvers } from './queries';
+import mutations, { fieldResolvers as mFieldResolvers } from './mutations';
 import federation from './federation';
-import fieldResolvers from './fieldResolvers';
 
 const createServer = {
   ...graphScalars,
   ...customScalars,
   ...federation,
+
+  ...qFieldResolvers,
+  ...mFieldResolvers,
+
   Query: {
     ...queries,
   },
+
   Mutation: {
     ...mutations,
   },
-  ...fieldResolvers,
 };
 
 export default createServer;

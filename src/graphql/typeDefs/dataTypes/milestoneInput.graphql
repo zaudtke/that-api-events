@@ -1,5 +1,11 @@
-input MilestoneInput {
+input MilestoneCreateInput {
   title: String!
-  description: String
+  description: String!
   dueDate: Date!
+}
+
+input MilestoneUpdateInput {
+  title: String
+  description: String
+  dueDate: Date
 }

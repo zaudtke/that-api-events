@@ -1,0 +1,5 @@
+type MilestonesMutation {
+  create(milestone: MilestoneCreateInput!): Milestone!
+  delete(id: ID!): ID
+  milestone(id: ID!): MilestoneMutation
+}

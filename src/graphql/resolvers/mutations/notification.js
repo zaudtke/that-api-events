@@ -1,28 +1,19 @@
+/* eslint-disable import/prefer-default-export */
 import notificationStore from '../../../dataSources/cloudFirestore/notification';
 
-const resolvers = {
-  createNotification: async (
-    parent,
-    { eventId, notification },
-    { dataSources: { firestore, logger } },
-  ) => notificationStore(firestore, logger).create(eventId, notification),
-
-  updateNotification: async (
-    parent,
-    { eventId, notificationId, notification },
-    { dataSources: { firestore, logger } },
-  ) =>
-    notificationStore(firestore, logger).update(
-      eventId,
-      notificationId,
-      notification,
-    ),
-
-  removeNotification: async (
-    parent,
-    { eventId, notificationId },
-    { dataSources: { firestore, logger } },
-  ) => notificationStore(firestore, logger).remove(eventId, notificationId),
+export const fieldResolvers = {
+  NotificationMutation: {
+    update: async (
+      { eventId, notificationId },
+      { notification },
+      { dataSources: { firestore, logger } },
+    ) => {
+      logger.debug('NotificationMutation.update called.');
+      return notificationStore(firestore, logger).update(
+        eventId,
+        notificationId,
+        notification,
+      );
+    },
+  },
 };
-
-export default resolvers;

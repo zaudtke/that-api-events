@@ -1,7 +1,9 @@
-import event from './event';
-import notification from './notification';
+import event, { fieldResolvers as eventFields } from './event';
 
 export default {
   ...event,
-  ...notification,
+};
+
+export const fieldResolvers = {
+  ...eventFields,
 };

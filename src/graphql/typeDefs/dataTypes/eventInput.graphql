@@ -1,4 +1,36 @@
-input EventInput {
+input EventCreateInput {
+  "The event friendly name"
+  name: String!
+
+  "What is this, in a few words?"
+  slogan: String!
+
+  "A short description about this event"
+  description: String!
+
+  "Starting day of the event."
+  startDate: Date!
+
+  "Ending day of the event."
+  endDate: Date!
+
+  "The year this event takes place in."
+  year: Int!
+
+  "The location where this event will take place."
+  venue: [ID]
+
+  "Main contact email address."
+  email: EmailAddress!
+
+  "Main phone number."
+  phoneNumber: PhoneNumber
+
+  "Website"
+  website: URL!
+}
+
+input EventUpdateInput {
   "The event friendly name"
   name: String
 
@@ -18,7 +50,7 @@ input EventInput {
   year: Int
 
   "The location where this event will take place."
-  venue: VenueInput
+  venue: [ID]
 
   "Main contact email address."
   email: EmailAddress
@@ -28,7 +60,4 @@ input EventInput {
 
   "Website"
   website: URL
-
-  "List of this event's milestones"
-  milestones: [MilestoneInput]
 }

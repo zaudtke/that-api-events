@@ -1,0 +1,5 @@
+type VenuesMutation {
+  create(venue: VenueUpdateInput!): Venue!
+  delete(id: ID!): ID
+  venue(id: ID!): VenueMutation
+}
