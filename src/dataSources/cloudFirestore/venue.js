@@ -25,17 +25,26 @@ const venue = (dbInstance, logger) => {
     };
   };
 
-  const findByIds = ids =>
-    // eslint-disable-next-line consistent-return
-    ids.filter(async id => {
-      const doc = await dbInstance.doc(`${collectionName}/${id}`).get();
-      if (doc.exists) {
-        return {
-          id: doc.id,
-          ...doc.data(),
-        };
-      }
-    });
+  const findByIds = async ids => {
+    let results = [];
+    if (ids && ids.length > 0) {
+      const dbResults = await Promise.all(
+        ids.map(id => {
+          const docRef = dbInstance.doc(`${collectionName}/${id}`);
+          return docRef.get();
+        }),
+      );
+
+      results = dbResults
+        .filter(doc => doc.exists)
+        .map(d => ({
+          id: d.id,
+          ...d.data(),
+        }));
+    }
+
+    return results;
+  };
 
   const findAll = async () => {
     const { docs } = await venueCollection.get();
