@@ -17,14 +17,25 @@ const venue = (dbInstance, logger) => {
   };
 
   const find = async id => {
-    const docRef = dbInstance.doc(`${collectionName}/${id}`);
-    const doc = await await docRef.get();
+    const doc = await dbInstance.doc(`${collectionName}/${id}`).get();
 
     return {
       id: doc.id,
       ...doc.data(),
     };
   };
+
+  const findByIds = ids =>
+    // eslint-disable-next-line consistent-return
+    ids.filter(async id => {
+      const doc = await dbInstance.doc(`${collectionName}/${id}`).get();
+      if (doc.exists) {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      }
+    });
 
   const findAll = async () => {
     const { docs } = await venueCollection.get();
@@ -53,7 +64,7 @@ const venue = (dbInstance, logger) => {
     });
   };
 
-  return { create, find, findAll, update };
+  return { create, find, findAll, findByIds, update };
 };
 
 export default venue;

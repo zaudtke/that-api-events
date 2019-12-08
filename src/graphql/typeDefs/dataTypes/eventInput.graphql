@@ -17,8 +17,8 @@ input EventCreateInput {
   "The year this event takes place in."
   year: Int!
 
-  "The location where this event will take place."
-  venue: [ID]
+  "The locations where this event will take place."
+  venues: [ID]
 
   "Main contact email address."
   email: EmailAddress!
@@ -49,8 +49,8 @@ input EventUpdateInput {
   "The year this event takes place in."
   year: Int
 
-  "The location where this event will take place."
-  venue: [ID]
+  "The locations where this event will take place."
+  venues: [ID]
 
   "Main contact email address."
   email: EmailAddress
