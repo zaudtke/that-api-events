@@ -10,7 +10,7 @@ type Venue @key(fields: "id") {
   webSite: URL!
 
   "Address line one."
-  address: String!
+  address: String
 
   "Address line two."
   addressLineTwo: String

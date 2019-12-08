@@ -21,8 +21,8 @@ type Event @key(fields: "id") {
   "The year this event takes place in."
   year: Int
 
-  "The location where this event will take place."
-  venue: Venue
+  "The locations where this event will take place."
+  venues: [Venue]
 
   "Main contact email address."
   email: EmailAddress
