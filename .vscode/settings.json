@@ -16,5 +16,8 @@
     "statusBarItem.hoverBackground": "#00b300",
     "statusBar.foreground": "#e7e7e7"
   },
-  "peacock.affectActivityBar": false
+  "peacock.affectActivityBar": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }
