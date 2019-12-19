@@ -1,4 +1,7 @@
+import debug from 'debug';
 import notificationStore from '../../../dataSources/cloudFirestore/notification';
+
+const dlog = debug('that-api-events:query');
 
 const resolvers = {
   notifications: async (
@@ -6,8 +9,9 @@ const resolvers = {
     { eventId },
     { dataSources: { firestore, logger } },
   ) => {
-    const id = eventId || parent.id;
+    dlog('notifications');
 
+    const id = eventId || parent.id;
     return notificationStore(firestore, logger).findAll(id);
   },
 };

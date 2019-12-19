@@ -1,15 +1,10 @@
-import eventStore from '../../../dataSources/cloudFirestore/event';
-import venueStore from '../../../dataSources/cloudFirestore/venue';
+/* eslint-disable import/prefer-default-export */
+import debug from 'debug';
 
 import notificationResolver from './notification';
+import venueStore from '../../../dataSources/cloudFirestore/venue';
 
-const resolvers = {
-  event: async (parent, { id }, { dataSources: { firestore, logger } }) =>
-    eventStore(firestore, logger).get(id),
-
-  events: async (parent, args, { dataSources: { firestore, logger } }) =>
-    eventStore(firestore, logger).getAll(),
-};
+const dlog = debug('that-api-events:query');
 
 export const fieldResolvers = {
   Event: {
@@ -19,10 +14,26 @@ export const fieldResolvers = {
       args,
       { dataSources: { firestore, logger } },
     ) => {
-      logger.debug('Event:venues called');
+      dlog('Event:venues');
       return venueStore(firestore, logger).findByIds(venues);
+    },
+    partners: (parent, args, { dataSources: { firestore, logger } }) => {
+      dlog('Event:partner ref');
+      return [
+        {
+          __typename: 'Partner',
+          id: 'v4WmCWU1LVzWsoJnenxC',
+        },
+        {
+          __typename: 'Partner',
+          id: 'wPA6h12zXHt5q8240bCg',
+        },
+      ];
+    },
+    sessions: (parent, args, { dataSources: { firestore, logger } }) => {
+      dlog('Event:sessions ref');
+      // todo: need to resolve the
+      return [];
     },
   },
 };
-
-export default resolvers;
