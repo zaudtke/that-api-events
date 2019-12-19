@@ -38,4 +38,18 @@ type Event @key(fields: "id") {
 
   "List of this event's notifications"
   notifications: [Notification]
+
+  "The list of partners for a given event"
+  partners: [Partner]
+
+  "The list of partners for a given event"
+  sessions: [Session]
+}
+
+extend type Partner @key(fields: "id") {
+  id: ID! @external
+}
+
+extend type Session @key(fields: "id") {
+  id: ID! @external
 }

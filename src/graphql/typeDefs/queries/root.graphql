@@ -1,0 +1,4 @@
+type Query {
+  events: EventsQuery
+  venues: VenuesQuery
+}
