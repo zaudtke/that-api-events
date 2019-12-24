@@ -13,7 +13,7 @@ import apolloGraphServer from './graphql';
 import { version } from '../package.json';
 
 const dlog = debug('that-api-events:index');
-const defaultVersion = `that-api-gateway@${version}`;
+const defaultVersion = `that-api-events@${version}`;
 const firestore = new Firestore();
 const api = connect();
 
