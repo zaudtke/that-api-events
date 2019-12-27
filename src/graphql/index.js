@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {
   ApolloServer,
   gql,
@@ -69,7 +70,8 @@ const createServer = ({ dataSources }, enableMocking = false) => {
       dlog('buulding graphql user context');
       let context = {};
 
-      if (req.headers.authorization) {
+      dlog('auth header %o', req.headers);
+      if (!_.isNil(req.headers.authorization)) {
         dlog('validating token for %o:', req.headers.authorization);
 
         const validatedToken = await security
