@@ -1,3 +1,4 @@
 type MilestoneMutation {
   update(milestone: MilestoneUpdateInput!): Milestone!
+    @auth(requires: "events:event:milestones")
 }

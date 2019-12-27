@@ -4,7 +4,7 @@ import debug from 'debug';
 import notificationResolver from './notification';
 import venueStore from '../../../dataSources/cloudFirestore/venue';
 
-const dlog = debug('that-api-events:query');
+const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
   Event: {

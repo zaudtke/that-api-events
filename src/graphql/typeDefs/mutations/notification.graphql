@@ -1,3 +1,4 @@
 type NotificationMutation {
   update(notification: NotificationUpdateInput!): Notification!
+    @auth(requires: "events:event:notifications")
 }

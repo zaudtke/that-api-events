@@ -3,7 +3,7 @@ import debug from 'debug';
 
 import eventStore from '../../../dataSources/cloudFirestore/event';
 
-const dlog = debug('that-api-events:query');
+const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
   EventsQuery: {

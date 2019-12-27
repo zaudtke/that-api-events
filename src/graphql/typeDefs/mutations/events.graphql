@@ -1,5 +1,5 @@
 type EventsMutation {
-  create(event: EventCreateInput!): Event!
-  delete(id: ID!): ID
-  event(id: ID!): EventMutation
+  create(event: EventCreateInput!): Event! @auth(requires: "events")
+  delete(id: ID!): ID @auth(requires: "events")
+  event(id: ID!): EventMutation @auth(requires: "events")
 }
