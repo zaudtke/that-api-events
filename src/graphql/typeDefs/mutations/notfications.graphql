@@ -1,5 +1,7 @@
 type NotificationsMutation {
   create(notification: NotificationCreateInput!): Notification!
-  delete(id: ID!): ID
+    @auth(requires: "events:event:notifications")
+  delete(id: ID!): ID @auth(requires: "events:event:notifications")
   notification(id: ID!): NotificationMutation
+    @auth(requires: "events:event:notifications")
 }

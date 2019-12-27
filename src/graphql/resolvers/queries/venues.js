@@ -3,7 +3,7 @@ import debug from 'debug';
 
 import venueStore from '../../../dataSources/cloudFirestore/venue';
 
-const dlog = debug('that-api-events:query');
+const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
   VenuesQuery: {
