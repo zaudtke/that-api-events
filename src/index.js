@@ -29,6 +29,8 @@ const logger = pino({
   },
 });
 
+dlog('function instance created');
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.THAT_ENVIRONMENT,
@@ -40,34 +42,29 @@ Sentry.configureScope(scope => {
   scope.setTag('thatApp', 'that-api-events');
 });
 
-const createConfig = () => ({
-  dataSources: {
-    sentry: Sentry,
-    logger,
-    firestore,
-  },
-});
+const createConfig = () => {
+  dlog('createConfig');
 
-const sentryMark = (req, res, next) => {
+  return {
+    dataSources: {
+      sentry: Sentry,
+      logger,
+      firestore,
+    },
+  };
+};
+
+const graphServer = apolloGraphServer(createConfig());
+
+function sentryMark(req, res, next) {
   Sentry.addBreadcrumb({
     category: 'that-api-events',
     message: 'init',
     level: Sentry.Severity.Info,
   });
   next();
-};
+}
 
-/**
- * http middleware function
- * here we are intercepting the http call and building our own notion of a users context.
- * we then add it to the request so it can later be used by the gateway.
- * If you had something like a token that needs to be passed through to the gateways children this is how you intercept it and setup for later.
- *
- * @param {string} req - http request
- * @param {string} res - http response
- * @param {string} next - next function to execute
- *
- */
 function createUserContext(req, res, next) {
   const enableMocking = () => {
     if (!req.headers['that-enable-mocks']) return false;
@@ -103,10 +100,6 @@ function createUserContext(req, res, next) {
 function apiHandler(req, res) {
   dlog('api handler called');
 
-  const graphServer = apolloGraphServer(
-    createConfig(),
-    req.userContext.enableMocking,
-  );
   const graphApi = graphServer.createHandler();
 
   graphApi(req, res);
@@ -126,11 +119,6 @@ function failure(err, req, res, next) {
     .json(err);
 }
 
-/**
- * http middleware function that follows adhering to express's middleware.
- * Last item in the middleware chain.
- * This is your api handler for your serverless function
- */
 export const graphEndpoint = api
   .use(cors())
   .use(responseTime())
