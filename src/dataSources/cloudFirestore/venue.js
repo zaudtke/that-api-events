@@ -1,9 +1,16 @@
+import debug from 'debug';
+
+const dlog = debug('that:api:events:datasources:firebase:venue');
+
 const collectionName = 'venues';
 
 const venue = (dbInstance, logger) => {
+  dlog('instance created');
+
   const venueCollection = dbInstance.collection(collectionName);
 
-  const create = async newVenue => {
+  async function create(newVenue) {
+    dlog('create');
     const scrubbedVenue = newVenue;
     if (newVenue.website) scrubbedVenue.website = newVenue.website.href;
 
@@ -14,18 +21,20 @@ const venue = (dbInstance, logger) => {
       id: newDocument.id,
       ...newVenue,
     };
-  };
+  }
 
-  const find = async id => {
+  async function find(id) {
+    dlog('find');
     const doc = await dbInstance.doc(`${collectionName}/${id}`).get();
 
     return {
       id: doc.id,
       ...doc.data(),
     };
-  };
+  }
 
-  const findByIds = async ids => {
+  async function findByIds(ids) {
+    dlog('find by id');
     let results = [];
     if (ids && ids.length > 0) {
       const dbResults = await Promise.all(
@@ -44,9 +53,10 @@ const venue = (dbInstance, logger) => {
     }
 
     return results;
-  };
+  }
 
-  const findAll = async () => {
+  async function findAll() {
+    dlog('findAll');
     const { docs } = await venueCollection.get();
 
     const results = docs.map(d => ({
@@ -55,9 +65,10 @@ const venue = (dbInstance, logger) => {
     }));
 
     return results;
-  };
+  }
 
-  const update = (id, venueInput) => {
+  function update(id, venueInput) {
+    dlog('update');
     const scrubbedVenue = venueInput;
     if (venueInput.website) scrubbedVenue.website = venueInput.website.href;
 
@@ -71,7 +82,7 @@ const venue = (dbInstance, logger) => {
         ...venueInput,
       };
     });
-  };
+  }
 
   return { create, find, findAll, findByIds, update };
 };

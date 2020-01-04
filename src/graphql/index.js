@@ -16,6 +16,8 @@ import directives from './directives';
 
 const dlog = debug('that:api:events:graphServer');
 
+const jwtClient = security.jwt();
+
 // convert our raw schema to gql
 const typeDefs = gql`
   ${typeDefsRaw}
@@ -31,6 +33,7 @@ const typeDefs = gql`
  *     createGateway(userContext)
  */
 const createServer = ({ dataSources }, enableMocking = false) => {
+  dlog('creating apollo server');
   let federatedSchemas = {};
 
   const { logger } = dataSources;
@@ -61,22 +64,22 @@ const createServer = ({ dataSources }, enableMocking = false) => {
     playground: JSON.parse(process.env.ENABLE_GRAPH_PLAYGROUND)
       ? { endpoint: '/' }
       : false,
-
+    tracing: false,
     dataSources: () => ({
       ...dataSources,
     }),
 
     context: async ({ req, res }) => {
-      dlog('buulding graphql user context');
+      dlog('building graphql user context');
       let context = {};
 
       dlog('auth header %o', req.headers);
       if (!_.isNil(req.headers.authorization)) {
         dlog('validating token for %o:', req.headers.authorization);
 
-        const validatedToken = await security
-          .jwt()
-          .verify(req.headers.authorization);
+        const validatedToken = await jwtClient.verify(
+          req.headers.authorization,
+        );
 
         dlog('validated token: %o', validatedToken);
         context = {

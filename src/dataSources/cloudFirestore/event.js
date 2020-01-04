@@ -1,8 +1,15 @@
+import debug from 'debug';
+
+const dlog = debug('that:api:events:datasources:firebase:event');
+
 const event = (dbInstance, logger) => {
+  dlog('instance created');
+
   const collectionName = 'events';
   const eventsCol = dbInstance.collection(collectionName);
 
   const create = async newEvent => {
+    dlog('create');
     const scrubbedEvent = newEvent;
 
     if (newEvent.website) scrubbedEvent.website = newEvent.website.href;
@@ -17,6 +24,7 @@ const event = (dbInstance, logger) => {
   };
 
   const get = async id => {
+    dlog('get');
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
     const doc = await await docRef.get();
 
@@ -27,6 +35,7 @@ const event = (dbInstance, logger) => {
   };
 
   const getAll = async () => {
+    dlog('get all');
     const { docs } = await eventsCol.get();
 
     const results = docs.map(d => ({
@@ -38,6 +47,7 @@ const event = (dbInstance, logger) => {
   };
 
   const update = (id, eventInput) => {
+    dlog('update');
     const scrubbedEvent = eventInput;
     if (eventInput.website) scrubbedEvent.website = eventInput.website.href;
 

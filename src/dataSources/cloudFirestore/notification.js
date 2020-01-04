@@ -1,8 +1,15 @@
+import debug from 'debug';
+
+const dlog = debug('that:api:events:datasources:firebase:notification');
+
 const collectionName = 'events';
 const subCollectionName = 'notifications';
 
 const event = (dbInstance, logger) => {
-  const create = (eventId, notification) => {
+  dlog('instance created');
+
+  function create(eventId, notification) {
+    dlog('create');
     const scrubbedNotification = notification;
     if (notification.link) scrubbedNotification.link = notification.link.href;
 
@@ -14,9 +21,10 @@ const event = (dbInstance, logger) => {
       id: doc.id,
       ...scrubbedNotification,
     }));
-  };
+  }
 
-  const findAll = async eventId => {
+  async function findAll(eventId) {
+    dlog('findAll');
     const colSnapshot = dbInstance
       .doc(`${collectionName}/${eventId}`)
       .collection(subCollectionName);
@@ -29,9 +37,10 @@ const event = (dbInstance, logger) => {
     }));
 
     return results;
-  };
+  }
 
-  const update = (eventId, notificationId, notification) => {
+  function update(eventId, notificationId, notification) {
+    dlog('update');
     const scrubbedNotification = notification;
     if (notification.link) scrubbedNotification.link = notification.link.href;
 
@@ -45,9 +54,10 @@ const event = (dbInstance, logger) => {
       id: notificationId,
       ...scrubbedNotification,
     }));
-  };
+  }
 
-  const remove = (eventId, notificationId) => {
+  function remove(eventId, notificationId) {
+    dlog('remove');
     const documentRef = dbInstance.doc(
       `${collectionName}/${eventId}/${subCollectionName}/${notificationId}`,
     );
@@ -56,7 +66,7 @@ const event = (dbInstance, logger) => {
       logger.debug(`removed event ${eventId} notification: ${notificationId}`);
       return notificationId;
     });
-  };
+  }
 
   return { create, findAll, update, remove };
 };
