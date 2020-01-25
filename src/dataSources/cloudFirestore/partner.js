@@ -24,6 +24,24 @@ function partnerCollection(dbInstance) {
     return results;
   }
 
+  async function findByLevel(eventId, level) {
+    dlog('findByLevel');
+
+    const colSnapshot = dbInstance
+      .doc(`${collectionName}/${eventId}`)
+      .collection(subCollectionName)
+      .where('level', '==', level);
+
+    const { docs } = await colSnapshot.get();
+
+    const results = docs.map(d => ({
+      id: d.id,
+      ...d.data(),
+    }));
+
+    return results;
+  }
+
   async function add(eventId, partnerId, partner) {
     dlog('add');
 
@@ -65,7 +83,7 @@ function partnerCollection(dbInstance) {
     });
   }
 
-  return { add, update, remove, findAll };
+  return { add, update, remove, findAll, findByLevel };
 }
 
 export default partnerCollection;

@@ -10,18 +10,18 @@ const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
   EventQuery: {
-    get: async ({ eventId }, _, { dataSources: { firestore, logger } }) => {
-      dlog('EventQuery.event');
+    get: ({ eventId }, _, { dataSources: { firestore, logger } }) => {
+      dlog('EventQuery.get');
       return eventStore(firestore, logger).get(eventId);
+    },
+    partners: ({ eventId }) => {
+      dlog('EventQuery.partners');
+      return { eventId };
     },
   },
   Event: {
     notifications: notificationResolver.notifications,
-    venues: async (
-      { venues },
-      args,
-      { dataSources: { firestore, logger } },
-    ) => {
+    venues: ({ venues }, args, { dataSources: { firestore, logger } }) => {
       dlog('Event:venues');
       return venueStore(firestore, logger).findByIds(venues);
     },
