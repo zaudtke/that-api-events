@@ -12,6 +12,8 @@ import { fieldResolvers as notificationFields } from './notification';
 import { fieldResolvers as venuesFields } from './venues';
 import { fieldResolvers as venueFields } from './venue';
 
+import { fieldResolvers as eventPartner } from './eventPartner';
+
 export default {
   ...rootMutations,
 };
@@ -25,4 +27,5 @@ export const fieldResolvers = {
   ...notificationFields,
   ...venuesFields,
   ...venueFields,
+  ...eventPartner,
 };

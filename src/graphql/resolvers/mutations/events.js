@@ -17,6 +17,6 @@ export const fieldResolvers = {
       throw new Error('Not Implemented yet.');
     },
 
-    event: (parent, { id }) => ({ eventId: id }),
+    event: (_, { id }) => ({ eventId: id }),
   },
 };

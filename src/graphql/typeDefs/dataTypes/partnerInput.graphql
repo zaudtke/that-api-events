@@ -1,0 +1,21 @@
+input EventPartnerAddInput {
+  # the partnership level for this event.
+  level: PartnershipLevel!
+
+  # physical location of a partners booth
+  location: String
+
+  # what is their placement for the given event and tier.
+  placement: Int!
+}
+
+input EventPartnerUpdateInput {
+  # the partnership level for this event.
+  level: PartnershipLevel
+
+  # physical location of a partners booth
+  location: String
+
+  # what is their placement for the given event and tier.
+  placement: Int
+}

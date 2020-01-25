@@ -1,4 +1,4 @@
 type EventsQuery {
   all: [Event]
-  event(id: ID!): Event
+  event(id: ID!): EventQuery
 }

@@ -3,36 +3,42 @@ import debug from 'debug';
 
 import notificationResolver from './notification';
 import venueStore from '../../../dataSources/cloudFirestore/venue';
+import eventStore from '../../../dataSources/cloudFirestore/event';
+import partnerStore from '../../../dataSources/cloudFirestore/partner';
 
 const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
+  EventQuery: {
+    get: ({ eventId }, _, { dataSources: { firestore, logger } }) => {
+      dlog('EventQuery.get');
+      return eventStore(firestore, logger).get(eventId);
+    },
+    partners: ({ eventId }) => {
+      dlog('EventQuery.partners');
+      return { eventId };
+    },
+  },
   Event: {
     notifications: notificationResolver.notifications,
-    venues: async (
-      { venues },
-      args,
-      { dataSources: { firestore, logger } },
-    ) => {
+    venues: ({ venues }, args, { dataSources: { firestore, logger } }) => {
       dlog('Event:venues');
       return venueStore(firestore, logger).findByIds(venues);
     },
-    partners: (parent, args, { dataSources: { firestore, logger } }) => {
-      dlog('Event:partner ref');
-      return [
-        {
-          __typename: 'Partner',
-          id: 'v4WmCWU1LVzWsoJnenxC',
-        },
-        {
-          __typename: 'Partner',
-          id: 'wPA6h12zXHt5q8240bCg',
-        },
-      ];
+    partners: ({ id }, args, { dataSources: { firestore } }) => {
+      dlog('partners %s', id);
+
+      return partnerStore(firestore)
+        .findAll(id)
+        .then(r =>
+          r.map(item => ({
+            ...item,
+            __typename: 'Partner',
+          })),
+        );
     },
-    sessions: (parent, args, { dataSources: { firestore, logger } }) => {
+    sessions: (_, __, { dataSources: { firestore } }) => {
       dlog('Event:sessions ref');
-      // todo: need to resolve the
       return [];
     },
   },

@@ -1,0 +1,13 @@
+extend type Partner @key(fields: "id") {
+  id: ID! @external
+
+  placement: Int!
+
+  # physical location of a partners booth
+  location: String
+
+  # sponsorship level
+  level: PartnershipLevel!
+
+  partner: Partner!
+}

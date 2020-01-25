@@ -1,0 +1,5 @@
+type EventPartnerMutation {
+  add(partner: EventPartnerAddInput!): Partner! @auth(requires: "events")
+  update(partner: EventPartnerUpdateInput!): Partner! @auth(requires: "events")
+  remove: ID! @auth(requires: "events")
+}

@@ -46,10 +46,6 @@ type Event @key(fields: "id") {
   sessions: [Session]
 }
 
-extend type Partner @key(fields: "id") {
-  id: ID! @external
-}
-
 extend type Session @key(fields: "id") {
   id: ID! @external
 }
