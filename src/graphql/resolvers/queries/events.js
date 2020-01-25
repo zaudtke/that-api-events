@@ -13,7 +13,7 @@ export const fieldResolvers = {
     },
     event: async (parent, { id }, { dataSources: { firestore, logger } }) => {
       dlog('EventsQuery.event');
-      return eventStore(firestore, logger).get(id);
+      return { eventId: id };
     },
   },
 };

@@ -1,7 +1,5 @@
 type MilestonesMutation {
-  create(milestone: MilestoneCreateInput!): Milestone!
-    @auth(requires: "events:event:milestones")
-  delete(id: ID!): ID @auth(requires: "events:event:milestones")
-  milestone(id: ID!): MilestoneMutation
-    @auth(requires: "events:event:milestones")
+  create(milestone: MilestoneCreateInput!): Milestone! @auth(requires: "events")
+  delete(id: ID!): ID @auth(requires: "events")
+  milestone(id: ID!): MilestoneMutation @auth(requires: "events")
 }

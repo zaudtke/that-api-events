@@ -13,5 +13,6 @@ export const fieldResolvers = {
     },
     notifications: ({ eventId }) => ({ eventId }),
     milestones: ({ eventId }) => ({ eventId }),
+    partner: ({ eventId }, { id }) => ({ eventId, partnerId: id }),
   },
 };

@@ -1,6 +1,6 @@
 type EventMutation {
   update(event: EventUpdateInput!): Event! @auth(requires: "events")
-  notifications: NotificationsMutation
-    @auth(requires: "events:event:notifications")
-  milestones: MilestonesMutation @auth(requires: "events:event:milestones")
+  notifications: NotificationsMutation @auth(requires: "events")
+  milestones: MilestonesMutation @auth(requires: "events")
+  partner(id: ID!): EventPartnerMutation @auth(requires: "events")
 }
