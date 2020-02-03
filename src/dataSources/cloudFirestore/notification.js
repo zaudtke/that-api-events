@@ -1,6 +1,6 @@
 import debug from 'debug';
 
-const dlog = debug('that:api:events:datasources:firebase:notification');
+const dlog = debug('that:api:events:dataSources:firebase:notification');
 
 const collectionName = 'events';
 const subCollectionName = 'notifications';
