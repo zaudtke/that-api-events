@@ -31,6 +31,9 @@ input EventCreateInput {
 
   "is voting for this event open or not"
   isVotingOpen: Boolean
+
+  "is call for speakers open or not"
+  isCallForSpeakersOpen: Boolean
 }
 
 input EventUpdateInput {
@@ -66,4 +69,7 @@ input EventUpdateInput {
 
   "is voting for this event open or not"
   isVotingOpen: Boolean
+
+  "is call for speakers open or not"
+  isCallForSpeakersOpen: Boolean
 }
