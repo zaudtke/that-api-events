@@ -5,6 +5,7 @@ import notificationResolver from './notification';
 import venueStore from '../../../dataSources/cloudFirestore/venue';
 import eventStore from '../../../dataSources/cloudFirestore/event';
 import partnerStore from '../../../dataSources/cloudFirestore/partner';
+import sessionStore from '../../../dataSources/cloudFirestore/session';
 
 const dlog = debug('that:api:events:query');
 
@@ -37,9 +38,10 @@ export const fieldResolvers = {
           })),
         );
     },
-    sessions: (_, __, { dataSources: { firestore } }) => {
-      dlog('Event:sessions ref');
-      return [];
+    sessions: ({ id }, __, { dataSources: { firestore, logger } }) => {
+      dlog('sessions');
+
+      return sessionStore(firestore, logger).findAllApprovedByEventId(id);
     },
   },
 };

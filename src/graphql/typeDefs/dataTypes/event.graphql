@@ -43,9 +43,8 @@ type Event @key(fields: "id") {
   partners: [Partner]
 
   "The list of partners for a given event"
-  sessions: [Session]
-}
+  sessions: [AcceptedSession]
 
-extend type Session @key(fields: "id") {
-  id: ID! @external
+  "is voting for this event open or not"
+  isVotingOpen: Boolean
 }

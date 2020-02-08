@@ -3,10 +3,10 @@ extend type Partner @key(fields: "id") {
 
   placement: Int!
 
-  # physical location of a partners booth
+  "physical location of a partners booth"
   location: String
 
-  # sponsorship level
+  "sponsorship level"
   level: PartnershipLevel!
 
   partner: Partner!
