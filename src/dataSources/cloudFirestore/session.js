@@ -20,7 +20,6 @@ const session = dbInstance => {
       id: d.id,
     }));
 
-    dlog('results %O', results);
     return results;
   }
 
