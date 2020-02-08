@@ -28,6 +28,9 @@ input EventCreateInput {
 
   "Website"
   website: URL!
+
+  "is voting for this event open or not"
+  isVotingOpen: Boolean
 }
 
 input EventUpdateInput {
@@ -60,4 +63,7 @@ input EventUpdateInput {
 
   "Website"
   website: URL
+
+  "is voting for this event open or not"
+  isVotingOpen: Boolean
 }

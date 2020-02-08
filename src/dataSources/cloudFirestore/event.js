@@ -26,7 +26,7 @@ const event = (dbInstance, logger) => {
   const get = async id => {
     dlog('get');
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
-    const doc = await await docRef.get();
+    const doc = await docRef.get();
 
     return {
       id: doc.id,
