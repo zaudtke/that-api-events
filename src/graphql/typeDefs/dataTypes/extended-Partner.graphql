@@ -8,6 +8,4 @@ extend type Partner @key(fields: "id") {
 
   "sponsorship level"
   level: PartnershipLevel!
-
-  partner: Partner!
 }
