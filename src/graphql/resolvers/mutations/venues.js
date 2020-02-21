@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import venueStore from '../../../dataSources/cloudFirestore/venue';
 
 export const fieldResolvers = {

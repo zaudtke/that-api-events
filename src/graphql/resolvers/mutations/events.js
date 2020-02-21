@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import eventStore from '../../../dataSources/cloudFirestore/event';
 
 export const fieldResolvers = {
