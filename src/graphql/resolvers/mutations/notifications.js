@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import notificationStore from '../../../dataSources/cloudFirestore/notification';
 
 export const fieldResolvers = {

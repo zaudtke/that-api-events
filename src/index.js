@@ -1,13 +1,12 @@
-/* eslint-disable import/prefer-default-export */
 import 'dotenv/config';
 import connect from 'connect';
-import cors from 'cors';
 import debug from 'debug';
 import { Firestore } from '@google-cloud/firestore';
 import pino from 'pino';
 import responseTime from 'response-time';
 import uuid from 'uuid/v4';
 import * as Sentry from '@sentry/node';
+import { middleware } from '@thatconference/api';
 
 import apolloGraphServer from './graphql';
 import { version } from '../package.json';
@@ -16,6 +15,7 @@ const dlog = debug('that:api:events:index');
 const defaultVersion = `that-api-events@${version}`;
 const firestore = new Firestore();
 const api = connect();
+const { requestLogger } = middleware;
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -97,12 +97,16 @@ function createUserContext(req, res, next) {
   next();
 }
 
+const graphApi = graphServer.createHandler({
+  cors: {
+    origin: '*',
+    credentials: true,
+  },
+});
+
 function apiHandler(req, res) {
   dlog('api handler called');
-
-  const graphApi = graphServer.createHandler();
-
-  graphApi(req, res);
+  return graphApi(req, res);
 }
 
 function failure(err, req, res, next) {
@@ -120,8 +124,8 @@ function failure(err, req, res, next) {
 }
 
 export const graphEndpoint = api
-  .use(cors())
   .use(responseTime())
+  .use(requestLogger('that:api:events').handler)
   .use(sentryMark)
   .use(createUserContext)
   .use(apiHandler)

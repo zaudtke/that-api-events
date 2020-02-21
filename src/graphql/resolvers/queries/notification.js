@@ -4,7 +4,7 @@ import notificationStore from '../../../dataSources/cloudFirestore/notification'
 const dlog = debug('that:api:events:query');
 
 const resolvers = {
-  notifications: async (
+  notifications: (
     parent,
     { eventId },
     { dataSources: { firestore, logger } },

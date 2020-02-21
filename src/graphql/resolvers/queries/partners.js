@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import debug from 'debug';
 
 import partnerStore from '../../../dataSources/cloudFirestore/partner';
