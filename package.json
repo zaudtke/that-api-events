@@ -21,7 +21,7 @@
     "@apollo/federation": "^0.12.1",
     "@google-cloud/firestore": "^3.5.1",
     "@sentry/node": "^5.12.4",
-    "@thatconference/api": "^1.4.0",
+    "@thatconference/api": "^1.4.1",
     "apollo-datasource-rest": "^0.7.0",
     "apollo-server": "^2.10.1",
     "apollo-server-cloud-functions": "^2.10.1",
