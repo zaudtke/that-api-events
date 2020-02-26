@@ -24,7 +24,7 @@ function partnerCollection(dbInstance) {
       ...d.data(),
     }));
 
-    const sortBy = ['PIONEER', 'EXPLORER', 'SCOUT', 'CUB', 'PATRION', 'MEDIA'];
+    const sortBy = ['PIONEER', 'EXPLORER', 'SCOUT', 'CUB', 'PATRON', 'MEDIA'];
 
     const sortedResults = _.sortBy(results, [
       customSort.stringSort({
