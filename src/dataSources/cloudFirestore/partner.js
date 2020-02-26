@@ -1,4 +1,7 @@
 import debug from 'debug';
+import _ from 'lodash';
+
+import customSort from '../../utilities/sort';
 
 const dlog = debug('that:api:events:datasources:firebase:events:partner');
 
@@ -21,7 +24,18 @@ function partnerCollection(dbInstance) {
       ...d.data(),
     }));
 
-    return results;
+    const sortBy = ['PIONEER', 'EXPLORER', 'SCOUT', 'MEDIA'];
+
+    const sortedResults = _.sortBy(results, [
+      customSort.stringSort({
+        data: results,
+        sortBy,
+        sortField: 'level',
+      }),
+      'placement',
+    ]);
+
+    return sortedResults;
   }
 
   async function findByLevel(eventId, level) {
@@ -39,7 +53,9 @@ function partnerCollection(dbInstance) {
       ...d.data(),
     }));
 
-    return results;
+    const sortedResult = _.sortBy(results, ['placement']);
+
+    return sortedResult;
   }
 
   async function add(eventId, partnerId, partner) {
