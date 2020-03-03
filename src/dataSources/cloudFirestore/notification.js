@@ -5,7 +5,7 @@ const dlog = debug('that:api:events:dataSources:firebase:notification');
 const collectionName = 'events';
 const subCollectionName = 'notifications';
 
-const event = (dbInstance, logger) => {
+const event = dbInstance => {
   dlog('instance created');
 
   function create(eventId, notification) {
@@ -44,8 +44,6 @@ const event = (dbInstance, logger) => {
     const scrubbedNotification = notification;
     if (notification.link) scrubbedNotification.link = notification.link.href;
 
-    logger.debug(`updating event ${eventId} notification: ${notificationId}`);
-
     const documentRef = dbInstance.doc(
       `${collectionName}/${eventId}/${subCollectionName}/${notificationId}`,
     );
@@ -62,10 +60,7 @@ const event = (dbInstance, logger) => {
       `${collectionName}/${eventId}/${subCollectionName}/${notificationId}`,
     );
 
-    return documentRef.delete().then(res => {
-      logger.debug(`removed event ${eventId} notification: ${notificationId}`);
-      return notificationId;
-    });
+    return documentRef.delete().then(res => notificationId);
   }
 
   return { create, findAll, update, remove };

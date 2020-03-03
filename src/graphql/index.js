@@ -8,6 +8,7 @@ import {
 import { buildFederatedSchema } from '@apollo/federation';
 import debug from 'debug';
 import { security, graph } from '@thatconference/api';
+import * as Sentry from '@sentry/node';
 
 // Graph Types and Resolvers
 import typeDefsRaw from './typeDefs';
@@ -35,8 +36,6 @@ const typeDefs = gql`
 const createServer = ({ dataSources }, enableMocking = false) => {
   dlog('creating apollo server');
   let federatedSchemas = {};
-
-  const { logger } = dataSources;
 
   if (!enableMocking) {
     federatedSchemas = buildFederatedSchema([{ typeDefs, resolvers }]);
@@ -77,9 +76,22 @@ const createServer = ({ dataSources }, enableMocking = false) => {
       if (!_.isNil(req.headers.authorization)) {
         dlog('validating token for %o:', req.headers.authorization);
 
+        Sentry.addBreadcrumb({
+          category: 'graphql context',
+          message: 'user has authToken',
+          level: Sentry.Severity.Info,
+        });
+
         const validatedToken = await jwtClient.verify(
           req.headers.authorization,
         );
+
+        Sentry.configureScope(scope => {
+          scope.setUser({
+            id: validatedToken.sub,
+            permissions: validatedToken.permissions.toString(),
+          });
+        });
 
         dlog('validated token: %o', validatedToken);
         context = {
@@ -107,9 +119,18 @@ const createServer = ({ dataSources }, enableMocking = false) => {
     ],
 
     formatError: err => {
-      logger.warn('graphql error', err);
+      dlog('formatError %O', err);
 
-      dataSources.sentry.captureException(err);
+      Sentry.withScope(scope => {
+        scope.setTag('formatError', true);
+        scope.setLevel('warning');
+
+        scope.setExtra('originalError', err.originalError);
+        scope.setExtra('path', err.path);
+
+        Sentry.captureException(err);
+      });
+
       return err;
     },
   });

@@ -4,7 +4,7 @@ const dlog = debug('that:api:events:datasources:firebase:venue');
 
 const collectionName = 'venues';
 
-const venue = (dbInstance, logger) => {
+const venue = dbInstance => {
   dlog('instance created');
 
   const venueCollection = dbInstance.collection(collectionName);
@@ -15,7 +15,6 @@ const venue = (dbInstance, logger) => {
     if (newVenue.website) scrubbedVenue.website = newVenue.website.href;
 
     const newDocument = await venueCollection.add(scrubbedVenue);
-    logger.debug(`created new venue: ${newDocument.id}`);
 
     return {
       id: newDocument.id,
@@ -74,14 +73,10 @@ const venue = (dbInstance, logger) => {
 
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
 
-    return docRef.update(venueInput).then(res => {
-      logger.debug(`updated event: ${id}`);
-
-      return {
-        id,
-        ...venueInput,
-      };
-    });
+    return docRef.update(venueInput).then(res => ({
+      id,
+      ...venueInput,
+    }));
   }
 
   return { create, find, findAll, findByIds, update };

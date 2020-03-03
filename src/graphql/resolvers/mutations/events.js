@@ -2,17 +2,10 @@ import eventStore from '../../../dataSources/cloudFirestore/event';
 
 export const fieldResolvers = {
   EventsMutation: {
-    create: async (
-      parent,
-      { event },
-      { dataSources: { firestore, logger } },
-    ) => {
-      logger.debug('EventsMutation:create called.');
-      return eventStore(firestore, logger).create(event);
-    },
+    create: async (parent, { event }, { dataSources: { firestore } }) =>
+      eventStore(firestore).create(event),
 
-    delete: (parent, { id }, { dataSources: { firestore, logger } }) => {
-      logger.debug('EventsMutation:delete called.');
+    delete: (parent, { id }, { dataSources: { firestore } }) => {
       throw new Error('Not Implemented yet.');
     },
 

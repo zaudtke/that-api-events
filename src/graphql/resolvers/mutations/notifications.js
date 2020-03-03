@@ -5,22 +5,11 @@ export const fieldResolvers = {
     create: async (
       { eventId },
       { notification },
-      { dataSources: { firestore, logger } },
-    ) => {
-      logger.debug('NotificationsMutation.create called.');
+      { dataSources: { firestore } },
+    ) => notificationStore(firestore).create(eventId, notification),
 
-      return notificationStore(firestore, logger).create(eventId, notification);
-    },
-
-    delete: async (
-      { eventId },
-      { id },
-      { dataSources: { firestore, logger } },
-    ) => {
-      logger.debug('NotificationsMutation.delete called.');
-
-      return notificationStore(firestore, logger).remove(eventId, id);
-    },
+    delete: async ({ eventId }, { id }, { dataSources: { firestore } }) =>
+      notificationStore(firestore).remove(eventId, id),
 
     notification: ({ eventId }, { id }) => ({ eventId, notificationId: id }),
   },

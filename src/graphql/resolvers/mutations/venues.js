@@ -2,17 +2,10 @@ import venueStore from '../../../dataSources/cloudFirestore/venue';
 
 export const fieldResolvers = {
   VenuesMutation: {
-    create: async (
-      parent,
-      { venue },
-      { dataSources: { firestore, logger } },
-    ) => {
-      logger.debug('VenuesMutation.create called.');
-      return venueStore(firestore, logger).create(venue);
-    },
+    create: async (parent, { venue }, { dataSources: { firestore } }) =>
+      venueStore(firestore).create(venue),
 
-    delete: (parent, { id }, { dataSources: { firestore, logger } }) => {
-      logger.debug('VenuesMutation.delete called.');
+    delete: (parent, { id }, { dataSources: { firestore } }) => {
       throw new Error('Not implemented yet.');
     },
 

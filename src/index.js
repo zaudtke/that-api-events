@@ -2,11 +2,9 @@ import 'dotenv/config';
 import connect from 'connect';
 import debug from 'debug';
 import { Firestore } from '@google-cloud/firestore';
-import pino from 'pino';
 import responseTime from 'response-time';
 import uuid from 'uuid/v4';
 import * as Sentry from '@sentry/node';
-import { middleware } from '@thatconference/api';
 
 import apolloGraphServer from './graphql';
 import { version } from '../package.json';
@@ -15,19 +13,6 @@ const dlog = debug('that:api:events:index');
 const defaultVersion = `that-api-events@${version}`;
 const firestore = new Firestore();
 const api = connect();
-const { requestLogger } = middleware;
-
-const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-  prettyPrint: JSON.parse(process.env.LOG_PRETTY_PRINT || false)
-    ? { colorize: true }
-    : false,
-  mixin() {
-    return {
-      service: 'that-api-events',
-    };
-  },
-});
 
 dlog('function instance created');
 
@@ -48,7 +33,6 @@ const createConfig = () => {
   return {
     dataSources: {
       sentry: Sentry,
-      logger,
       firestore,
     },
   };
@@ -58,7 +42,7 @@ const graphServer = apolloGraphServer(createConfig());
 
 function sentryMark(req, res, next) {
   Sentry.addBreadcrumb({
-    category: 'that-api-events',
+    category: 'root',
     message: 'init',
     level: Sentry.Severity.Info,
   });
@@ -68,8 +52,6 @@ function sentryMark(req, res, next) {
 function createUserContext(req, res, next) {
   const enableMocking = () => {
     if (!req.headers['that-enable-mocks']) return false;
-
-    logger.info('mocking enabled');
 
     const headerValues = req.headers['that-enable-mocks'].split(',');
     const mocks = headerValues.map(i => i.trim().toUpperCase());
@@ -81,17 +63,14 @@ function createUserContext(req, res, next) {
     ? req.headers['that-correlation-id']
     : uuid();
 
-  const contextLogger = logger.child({ correlationId });
+  Sentry.configureScope(scope => {
+    scope.setTag('correlationId', correlationId);
+  });
 
   req.userContext = {
-    locale: req.headers.locale,
     authToken: req.headers.authorization,
-    correlationId: req.headers['that-correlation-id']
-      ? req.headers['that-correlation-id']
-      : uuid(),
+    correlationId,
     enableMocking: enableMocking(),
-    sentry: Sentry,
-    logger: contextLogger,
   };
 
   next();
@@ -111,10 +90,6 @@ function apiHandler(req, res) {
 
 function failure(err, req, res, next) {
   dlog('error %o', err);
-
-  logger.error(err);
-  logger.trace('Middleware Catch All');
-
   Sentry.captureException(err);
 
   res
@@ -125,7 +100,6 @@ function failure(err, req, res, next) {
 
 export const graphEndpoint = api
   .use(responseTime())
-  .use(requestLogger('that:api:events').handler)
   .use(sentryMark)
   .use(createUserContext)
   .use(apiHandler)
