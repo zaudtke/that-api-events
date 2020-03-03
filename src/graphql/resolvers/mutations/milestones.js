@@ -1,15 +1,9 @@
 export const fieldResolvers = {
   MilestonesMutation: {
-    create: (
-      { eventId },
-      { milestone },
-      { dataSources: { firestore, logger } },
-    ) => {
-      logger.debug('MilestonesMutation:create called');
+    create: ({ eventId }, { milestone }, { dataSources: { firestore } }) => {
       throw new Error('Not implemented yet.');
     },
-    delete: ({ eventId }, { id }, { dataSources: { firestore, logger } }) => {
-      logger.debug('MilestonesMutation:delete called');
+    delete: ({ eventId }, { id }, { dataSources: { firestore } }) => {
       throw new Error('Not implemented yet.');
     },
     milestone: ({ eventId }, { id }) => ({

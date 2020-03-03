@@ -1,12 +1,6 @@
 const resolvers = {
-  events: (parent, args, { dataSources: { logger } }) => {
-    logger.info('root:events mutation called');
-    return {};
-  },
-  venues: (parent, args, { dataSources: { logger } }) => {
-    logger.info('root:venues mutation called');
-    return {};
-  },
+  events: (parent, args) => ({}),
+  venues: (parent, args) => ({}),
 };
 
 export default resolvers;

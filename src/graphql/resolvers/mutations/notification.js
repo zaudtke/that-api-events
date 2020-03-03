@@ -5,14 +5,12 @@ export const fieldResolvers = {
     update: async (
       { eventId, notificationId },
       { notification },
-      { dataSources: { firestore, logger } },
-    ) => {
-      logger.debug('NotificationMutation.update called.');
-      return notificationStore(firestore, logger).update(
+      { dataSources: { firestore } },
+    ) =>
+      notificationStore(firestore).update(
         eventId,
         notificationId,
         notification,
-      );
-    },
+      ),
   },
 };

@@ -10,9 +10,9 @@ const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
   EventQuery: {
-    get: ({ eventId }, _, { dataSources: { firestore, logger } }) => {
+    get: ({ eventId }, _, { dataSources: { firestore } }) => {
       dlog('EventQuery.get');
-      return eventStore(firestore, logger).get(eventId);
+      return eventStore(firestore).get(eventId);
     },
     partners: ({ eventId }) => {
       dlog('EventQuery.partners');
@@ -21,9 +21,9 @@ export const fieldResolvers = {
   },
   Event: {
     notifications: notificationResolver.notifications,
-    venues: ({ venues }, args, { dataSources: { firestore, logger } }) => {
+    venues: ({ venues }, args, { dataSources: { firestore } }) => {
       dlog('Event:venues');
-      return venueStore(firestore, logger).findByIds(venues);
+      return venueStore(firestore).findByIds(venues);
     },
     partners: ({ id }, args, { dataSources: { firestore } }) => {
       dlog('partners %s', id);
@@ -37,10 +37,10 @@ export const fieldResolvers = {
           })),
         );
     },
-    sessions: ({ id }, __, { dataSources: { firestore, logger } }) => {
+    sessions: ({ id }, __, { dataSources: { firestore } }) => {
       dlog('sessions');
 
-      return sessionStore(firestore, logger).findAllApprovedByEventId(id);
+      return sessionStore(firestore).findAllApprovedByEventId(id);
     },
   },
 };

@@ -2,7 +2,7 @@ import debug from 'debug';
 
 const dlog = debug('that:api:events:datasources:firebase:event');
 
-const event = (dbInstance, logger) => {
+const event = dbInstance => {
   dlog('instance created');
 
   const collectionName = 'events';
@@ -15,7 +15,6 @@ const event = (dbInstance, logger) => {
     if (newEvent.website) scrubbedEvent.website = newEvent.website.href;
 
     const newDocument = await eventsCol.add(scrubbedEvent);
-    logger.debug(`created new event: ${newDocument.id}`);
 
     return {
       id: newDocument.id,
@@ -53,14 +52,10 @@ const event = (dbInstance, logger) => {
 
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
 
-    return docRef.update(eventInput).then(res => {
-      logger.debug(`updated event: ${id}`);
-
-      return {
-        id,
-        ...eventInput,
-      };
-    });
+    return docRef.update(eventInput).then(res => ({
+      id,
+      ...eventInput,
+    }));
   };
 
   return { create, getAll, get, update };

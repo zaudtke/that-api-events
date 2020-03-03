@@ -6,14 +6,14 @@ const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
   VenuesQuery: {
-    all: (_, __, { dataSources: { firestore, logger } }) => {
+    all: (_, __, { dataSources: { firestore } }) => {
       dlog('VenuesQuery:all');
-      return venueStore(firestore, logger).findAll();
+      return venueStore(firestore).findAll();
     },
 
-    venue: (_, { id }, { dataSources: { firestore, logger } }) => {
+    venue: (_, { id }, { dataSources: { firestore } }) => {
       dlog('VenuesQuery:venue');
-      return venueStore(firestore, logger).find(id);
+      return venueStore(firestore).find(id);
     },
   },
 };
