@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import connect from 'express';
+import express from 'express';
 import debug from 'debug';
 import { Firestore } from '@google-cloud/firestore';
 import responseTime from 'response-time';
@@ -12,7 +12,7 @@ import { version } from '../package.json';
 const dlog = debug('that:api:events:index');
 const defaultVersion = `that-api-events@${version}`;
 const firestore = new Firestore();
-const api = connect();
+const api = express();
 
 dlog('function instance created');
 
@@ -76,18 +76,6 @@ function createUserContext(req, res, next) {
   next();
 }
 
-const graphApi = graphServer.createHandler({
-  cors: {
-    origin: '*',
-    credentials: true,
-  },
-});
-
-function apiHandler(req, res) {
-  dlog('api handler called');
-  return graphApi(req, res);
-}
-
 function failure(err, req, res, next) {
   dlog('error %o', err);
   Sentry.captureException(err);
@@ -98,9 +86,12 @@ function failure(err, req, res, next) {
     .json(err);
 }
 
-export const graphEndpoint = api
+api
+  .set('etag', false)
   .use(responseTime())
   .use(sentryMark)
   .use(createUserContext)
-  .use(apiHandler)
   .use(failure);
+
+graphServer.applyMiddleware({ app: api, path: '/' });
+api.listen({ port: 8001 });
