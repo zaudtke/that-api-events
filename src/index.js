@@ -105,5 +105,5 @@ api
   .use(failure);
 
 graphServer.applyMiddleware({ app: api, path: '/' });
-const port = process.env.PORT;
+const port = process.env.PORT || 8001;
 api.listen({ port }, () => dlog(`events running on %d`, port));
