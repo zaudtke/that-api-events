@@ -7,7 +7,18 @@ import uuid from 'uuid/v4';
 import * as Sentry from '@sentry/node';
 
 import apolloGraphServer from './graphql';
-import { version } from '../package.json';
+// import { version } from '../package.json';
+
+let version;
+(async () => {
+  let p;
+  try {
+    p = await import('./package.json');
+  } catch {
+    p = await import('../package.json');
+  }
+  version = p.version;
+})();
 
 const dlog = debug('that:api:events:index');
 const defaultVersion = `that-api-events@${version}`;
@@ -94,4 +105,5 @@ api
   .use(failure);
 
 graphServer.applyMiddleware({ app: api, path: '/' });
-api.listen({ port: 8001 });
+const port = process.env.PORT;
+api.listen({ port }, () => dlog(`events running on %d`, port));
