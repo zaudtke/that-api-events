@@ -1,10 +1,10 @@
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import faker from 'faker';
 
 const mockEvent = () => ({
   __typename: 'Event',
-  id: uuid(),
+  id: uuidv4(),
   startDate: moment().subtract(1, 'days'),
   endDate: moment().add(3, 'days'),
   name: faker.lorem.word(),

@@ -1,9 +1,9 @@
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import faker from 'faker';
 
 const mockVenue = () => ({
   __typename: 'Venue',
-  id: uuid(),
+  id: uuidv4(),
   name: faker.company.companyName(),
   address: faker.address.streetAddress(),
   addressLineTwo: faker.address.secondaryAddress(),

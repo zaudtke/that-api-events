@@ -1,18 +1,29 @@
 import 'dotenv/config';
-import connect from 'connect';
+import express from 'express';
 import debug from 'debug';
 import { Firestore } from '@google-cloud/firestore';
 import responseTime from 'response-time';
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import * as Sentry from '@sentry/node';
 
 import apolloGraphServer from './graphql';
-import { version } from '../package.json';
+// import { version } from '../package.json';
+
+let version;
+(async () => {
+  let p;
+  try {
+    p = await import('./package.json');
+  } catch {
+    p = await import('../package.json');
+  }
+  version = p.version;
+})();
 
 const dlog = debug('that:api:events:index');
 const defaultVersion = `that-api-events@${version}`;
 const firestore = new Firestore();
-const api = connect();
+const api = express();
 
 dlog('function instance created');
 
@@ -61,7 +72,7 @@ function createUserContext(req, res, next) {
 
   const correlationId = req.headers['that-correlation-id']
     ? req.headers['that-correlation-id']
-    : uuid();
+    : uuidv4();
 
   Sentry.configureScope(scope => {
     scope.setTag('correlationId', correlationId);
@@ -76,18 +87,6 @@ function createUserContext(req, res, next) {
   next();
 }
 
-const graphApi = graphServer.createHandler({
-  cors: {
-    origin: '*',
-    credentials: true,
-  },
-});
-
-function apiHandler(req, res) {
-  dlog('api handler called');
-  return graphApi(req, res);
-}
-
 function failure(err, req, res, next) {
   dlog('error %o', err);
   Sentry.captureException(err);
@@ -98,9 +97,14 @@ function failure(err, req, res, next) {
     .json(err);
 }
 
-export const graphEndpoint = api
+api
   .use(responseTime())
   .use(sentryMark)
   .use(createUserContext)
-  .use(apiHandler)
   .use(failure);
+
+graphServer.applyMiddleware({ app: api, path: '/' });
+// const port = process.env.PORT || 8001;
+// api.listen({ port }, () => dlog(`events running on %d`, port));
+
+export const handler = api;
