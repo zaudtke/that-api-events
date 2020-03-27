@@ -3,7 +3,7 @@ import express from 'express';
 import debug from 'debug';
 import { Firestore } from '@google-cloud/firestore';
 import responseTime from 'response-time';
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import * as Sentry from '@sentry/node';
 
 import apolloGraphServer from './graphql';
@@ -72,7 +72,7 @@ function createUserContext(req, res, next) {
 
   const correlationId = req.headers['that-correlation-id']
     ? req.headers['that-correlation-id']
-    : uuid();
+    : uuidv4();
 
   Sentry.configureScope(scope => {
     scope.setTag('correlationId', correlationId);
