@@ -52,10 +52,7 @@ const event = dbInstance => {
 
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
 
-    return docRef.update(eventInput).then(res => ({
-      id,
-      ...eventInput,
-    }));
+    return docRef.update(eventInput).then(() => get(id));
   };
 
   return { create, getAll, get, update };
