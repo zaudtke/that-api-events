@@ -14,5 +14,9 @@ export const fieldResolvers = {
       dlog('EventsQuery.event');
       return { eventId: id };
     },
+    eventBySlug: (_, { slug }, { dataSources: { firestore } }) => {
+      dlog('eventBySlug');
+      return eventStore(firestore).findBySlug(slug);
+    },
   },
 };
