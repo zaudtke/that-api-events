@@ -10,19 +10,20 @@ const event = dbInstance => {
 
   const findBySlug = async slug => {
     dlog('find by slug');
-    const colSnapshot = eventsCol.where('slug', '==', slug);
+    const slimSlug = slug.trim();
+    const colSnapshot = eventsCol.where('slug', '==', slimSlug);
     const { size, docs } = await colSnapshot.get();
 
     let result = null;
     if (size === 1) {
-      dlog('have 1 doc returned for slug %s', slug);
+      dlog('have 1 doc returned for slug %s', slimSlug);
       const [d] = docs;
       result = {
         id: d.id,
         ...d.data(),
       };
     } else if (size > 1) {
-      throw new Error(`Multiple Event slugs found for ${slug}`);
+      throw new Error(`Multiple Event slugs found for ${slimSlug}`);
     }
 
     return result;
@@ -31,6 +32,7 @@ const event = dbInstance => {
   const create = async newEvent => {
     dlog('create with slug %s', newEvent.slug);
     const scrubbedEvent = newEvent;
+    scrubbedEvent.slug = scrubbedEvent.slug.trim();
 
     const slugCheck = await findBySlug(scrubbedEvent.slug);
     if (slugCheck)
@@ -72,8 +74,10 @@ const event = dbInstance => {
   const update = async (id, eventInput) => {
     dlog('update id: %s', id);
     const scrubbedEvent = eventInput;
-    if (eventInput.slug) {
-      const slugCheck = await findBySlug(eventInput.slug);
+
+    if (scrubbedEvent.slug) {
+      scrubbedEvent.slug = scrubbedEvent.slug.trim();
+      const slugCheck = await findBySlug(scrubbedEvent.slug);
       if (slugCheck) {
         if (slugCheck.id !== id)
           throw new Error(`Event slug, ${scrubbedEvent.slug}, is taken`);
