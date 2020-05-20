@@ -6,6 +6,9 @@ type Event @key(fields: "id") {
   "The event friendly name"
   name: String!
 
+  "Friendly unique id to identify event follows path name, e.g. wi/2012"
+  slug: String!
+
   "What is this, in a few words?"
   slogan: String
 
