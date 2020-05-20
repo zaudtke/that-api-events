@@ -1,0 +1,4 @@
+type CommunitiesQuery {
+  community(id: ID!): Community
+  all: [Community]
+}

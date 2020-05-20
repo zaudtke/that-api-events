@@ -1,0 +1,11 @@
+"Community Information, organizes events"
+type Community @key(fields: "id") {
+  "Unique ID"
+  id: ID!
+
+  "Community Name"
+  name: String!
+
+  "Events associated with Community"
+  events: [Event]
+}
