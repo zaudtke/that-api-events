@@ -69,9 +69,17 @@ const event = dbInstance => {
     return results;
   };
 
-  const update = (id, eventInput) => {
-    dlog('update');
+  const update = async (id, eventInput) => {
+    dlog('update id: %s', id);
     const scrubbedEvent = eventInput;
+    if (eventInput.slug) {
+      const slugCheck = await findBySlug(eventInput.slug);
+      if (slugCheck) {
+        if (slugCheck.id !== id)
+          throw new Error(`Event slug, ${scrubbedEvent.slug}, is taken`);
+      }
+    }
+
     if (eventInput.website) scrubbedEvent.website = eventInput.website.href;
 
     const docRef = dbInstance.doc(`${collectionName}/${id}`);

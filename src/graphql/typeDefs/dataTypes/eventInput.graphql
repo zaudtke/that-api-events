@@ -46,6 +46,9 @@ input EventUpdateInput {
   "What is this, in a few words?"
   slogan: String
 
+  "Friendly unique id to identify event. Follows path name, e.g. wi/2012"
+  slug: String
+
   "A short description about this event"
   description: String
 
