@@ -37,6 +37,15 @@ input EventCreateInput {
 
   "is call for speakers open or not"
   isCallForSpeakersOpen: Boolean
+
+  "Will this event show in the list of events for a comunity. Active or not active"
+  isFeatured: Boolean
+
+  "This event is Active. It has current activities happening"
+  isActive: Boolean
+
+  "The community this Event is part of"
+  community: String
 }
 
 input EventUpdateInput {
@@ -78,4 +87,13 @@ input EventUpdateInput {
 
   "is call for speakers open or not"
   isCallForSpeakersOpen: Boolean
+
+  "Will this event show in the list of events for a comunity. Active or not active"
+  isFeatured: Boolean
+
+  "This event is Active. It has current activities happening"
+  isActive: Boolean
+
+  "The community this Event is part of"
+  community: String
 }

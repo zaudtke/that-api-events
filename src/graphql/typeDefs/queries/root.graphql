@@ -1,4 +1,5 @@
 type Query {
   events: EventsQuery
   venues: VenuesQuery
+  communities(name: String!): CommunitiesQuery
 }
