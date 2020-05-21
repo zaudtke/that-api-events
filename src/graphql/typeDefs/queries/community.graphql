@@ -1,4 +1,7 @@
 type CommunitiesQuery {
-  community(id: ID!): Community
-  all: [Community]
+  "Active events by community"
+  active: [Event]
+
+  "All events by community, active or not, but is featured"
+  all: [Event]
 }

@@ -6,7 +6,7 @@ import eventStore from '../../../dataSources/cloudFirestore/event';
 import partnerStore from '../../../dataSources/cloudFirestore/partner';
 import sessionStore from '../../../dataSources/cloudFirestore/session';
 
-const dlog = debug('that:api:events:query');
+const dlog = debug('that:api:event:query');
 
 export const fieldResolvers = {
   EventQuery: {

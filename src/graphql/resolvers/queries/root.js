@@ -11,6 +11,10 @@ const resolvers = {
     dlog('root:venues query called');
     return {};
   },
+  communities: (_, { name }) => {
+    dlog('root:communities query called');
+    return { name };
+  },
 };
 
 export default resolvers;
