@@ -1,0 +1,7 @@
+type EventTheme {
+  heroSlug: String
+  primary: String!
+  secondary: String!
+  tertiary: String!
+  highlight: String!
+}

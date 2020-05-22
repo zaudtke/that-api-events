@@ -62,4 +62,7 @@ type Event @key(fields: "id") {
 
   "The community this Event is part of"
   community: String
+
+  "Represents the overall color theme for this event"
+  theme: EventTheme
 }

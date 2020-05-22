@@ -1,0 +1,15 @@
+input EventThemeCreateInput {
+  heroSlug: String
+  primary: String!
+  secondary: String!
+  tertiary: String!
+  highlight: String!
+}
+
+input EventThemeUpdateInput {
+  heroSlug: String
+  primary: String!
+  secondary: String!
+  tertiary: String!
+  highlight: String!
+}
