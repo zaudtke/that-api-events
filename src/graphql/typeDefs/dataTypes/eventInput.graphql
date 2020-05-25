@@ -46,6 +46,9 @@ input EventCreateInput {
 
   "The community this Event is part of"
   community: String
+
+  "Represents the overall color theme for this event"
+  theme: EventThemeCreateInput
 }
 
 input EventUpdateInput {
@@ -96,4 +99,7 @@ input EventUpdateInput {
 
   "The community this Event is part of"
   community: String
+
+  "Represents the overall color theme for this event"
+  theme: EventThemeUpdateInput
 }
