@@ -1,15 +1,33 @@
 input EventThemeCreateInput {
+  "Path to hero image"
   heroSlug: String
+
+  "Primary color of theme"
   primary: String!
+
+  "Secondary color of theme"
   secondary: String!
+
+  "Tertiary color of theme"
   tertiary: String!
+
+  "Action on mouse-over of event?"
   highlight: String!
 }
 
 input EventThemeUpdateInput {
+  "Path to hero image"
   heroSlug: String
+
+  "Primary color of theme"
   primary: String!
+
+  "Secondary color of theme"
   secondary: String!
+
+  "Tertiary color of theme"
   tertiary: String!
+
+  "Action on mouse-over of event?"
   highlight: String!
 }
