@@ -9,7 +9,7 @@ const event = dbInstance => {
   dlog('instance created');
 
   function get(eventId, milestoneId) {
-    dlog('get milestone: %s from event: ', milestoneId, eventId);
+    dlog('get milestone: %s from event: %s', milestoneId, eventId);
     const docRef = dbInstance.doc(
       `${collectionName}/${eventId}/${subCollectionName}/${milestoneId}`,
     );
@@ -59,8 +59,9 @@ const event = dbInstance => {
     const docref = dbInstance.doc(
       `${collectionName}/${eventId}/${subCollectionName}/${milestoneId}`,
     );
-
-    return docref.update(scrubbedMilestone).then(() => get(milestoneId));
+    return docref
+      .update(scrubbedMilestone)
+      .then(() => get(eventId, milestoneId));
   }
 
   return { get, create, findAll, update };

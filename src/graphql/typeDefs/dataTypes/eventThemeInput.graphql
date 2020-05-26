@@ -20,14 +20,14 @@ input EventThemeUpdateInput {
   heroSlug: String
 
   "Primary color of theme"
-  primary: String!
+  primary: String
 
   "Secondary color of theme"
-  secondary: String!
+  secondary: String
 
   "Tertiary color of theme"
-  tertiary: String!
+  tertiary: String
 
   "Action on mouse-over of event?"
-  highlight: String!
+  highlight: String
 }

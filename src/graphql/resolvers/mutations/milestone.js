@@ -2,12 +2,10 @@ import milestoneStore from '../../../dataSources/cloudFirestore/milestone';
 
 export const fieldResolvers = {
   MilestoneMutation: {
-    update: async (
+    update: (
       { eventId, milestoneId },
       { milestone },
       { dataSources: { firestore } },
-    ) => {
-      milestoneStore(firestore).update(eventId, milestoneId, milestone);
-    },
+    ) => milestoneStore(firestore).update(eventId, milestoneId, milestone),
   },
 };

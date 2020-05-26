@@ -7,5 +7,5 @@ type Milestone @key(fields: "id") {
   "Description of this milestone"
   description: String
   "The date associated with the milestone"
-  dueDate: Date
+  dueDate: Date!
 }

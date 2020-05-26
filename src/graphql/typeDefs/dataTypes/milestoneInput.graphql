@@ -4,12 +4,12 @@ input MilestoneCreateInput {
   "Description of this milestone"
   description: String
   "The date associated with the milestone"
-  dueDate: Date
+  dueDate: Date!
 }
 
 input MilestoneUpdateInput {
   "Title of milestone"
-  title: String!
+  title: String
   "Description of this milestone"
   description: String
   "The date associated with the milestone"
