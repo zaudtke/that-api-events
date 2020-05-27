@@ -23,6 +23,7 @@ const event = dbInstance => {
   function create(eventId, milestone) {
     dlog('create');
     const scrubbedMilestone = milestone;
+    // scrubbedMilestone.dueDate = new Date(scrubbedMilestone.dueDate);
 
     const ref = dbInstance
       .doc(`${collectionName}/${eventId}`)
@@ -55,6 +56,9 @@ const event = dbInstance => {
   function update(eventId, milestoneId, milestone) {
     dlog('update id: %s on eventId: %s', milestoneId, eventId);
     const scrubbedMilestone = milestone;
+    if (scrubbedMilestone.dueDate) {
+      scrubbedMilestone.dueDate = new Date(scrubbedMilestone.dueDate);
+    }
 
     const docref = dbInstance.doc(
       `${collectionName}/${eventId}/${subCollectionName}/${milestoneId}`,
