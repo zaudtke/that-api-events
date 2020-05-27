@@ -5,6 +5,7 @@ import venueStore from '../../../dataSources/cloudFirestore/venue';
 import eventStore from '../../../dataSources/cloudFirestore/event';
 import partnerStore from '../../../dataSources/cloudFirestore/partner';
 import sessionStore from '../../../dataSources/cloudFirestore/session';
+import milestoneResolver from './milestone';
 
 const dlog = debug('that:api:event:query');
 
@@ -21,6 +22,7 @@ export const fieldResolvers = {
   },
   Event: {
     notifications: notificationResolver.notifications,
+    milestones: milestoneResolver.milestones,
     venues: ({ venues }, args, { dataSources: { firestore } }) => {
       dlog('Event:venues');
       return venueStore(firestore).findByIds(venues);

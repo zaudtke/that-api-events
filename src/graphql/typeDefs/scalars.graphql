@@ -1,4 +1,3 @@
-scalar DateTime
 scalar PhoneNumber
 scalar URL
 scalar PostalCode

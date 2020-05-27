@@ -1,11 +1,11 @@
+import milestoneStore from '../../../dataSources/cloudFirestore/milestone';
+
 export const fieldResolvers = {
   MilestoneMutation: {
     update: (
       { eventId, milestoneId },
       { milestone },
       { dataSources: { firestore } },
-    ) => {
-      throw new Error('Not implemented yet.');
-    },
+    ) => milestoneStore(firestore).update(eventId, milestoneId, milestone),
   },
 };

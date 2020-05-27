@@ -1,6 +1,11 @@
+"THAT Milestone marker"
 type Milestone @key(fields: "id") {
+  "Unique milestone id"
   id: ID!
+  "Title of milestone"
   title: String!
+  "Description of this milestone"
   description: String
-  dueDate: Date
+  "The date associated with the milestone"
+  dueDate: Date!
 }

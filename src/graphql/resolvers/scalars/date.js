@@ -1,8 +1,12 @@
 import moment from 'moment';
 import _ from 'lodash';
+import debug from 'debug';
+
 import { GraphQLScalarType } from 'graphql';
 import { GraphQLError } from 'graphql/error';
 import { Kind } from 'graphql/language';
+
+const dlog = debug('that:api:events:resolvers:scalars:date');
 
 const isDate = value => {
   if (!moment(value).valueOf()) {
@@ -33,19 +37,35 @@ export default {
 
     // value from the client
     parseValue(value) {
+      dlog('parseValue');
+
       validateString(value);
       validateDateFormat(value);
 
-      return value;
+      const parsedDate = new Date(value);
+      dlog('parsed Date', parsedDate);
+
+      return parsedDate;
     },
 
     // sent to the client
     serialize(value) {
-      isDate(value);
-      return moment(value).toJSON();
+      dlog('seralize', value);
+
+      let result;
+
+      if (value.toDate) {
+        dlog('converting firebase Timestamp');
+        result = value.toDate();
+      } else if (isDate(value)) {
+        result = value;
+      }
+
+      return result;
     },
 
     parseLiteral(ast) {
+      dlog('parseLiteral');
       if (ast.kind !== Kind.STRING) {
         throw new GraphQLError(
           `Can only validate strings as date but got a: ${ast.kind}`,
