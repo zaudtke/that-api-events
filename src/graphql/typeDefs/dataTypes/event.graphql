@@ -61,7 +61,7 @@ type Event @key(fields: "id") {
   isActive: Boolean
 
   "The community this Event is part of"
-  community: String
+  community: String!
 
   "Represents the overall color theme for this event"
   theme: EventTheme
