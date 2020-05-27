@@ -41,8 +41,14 @@ export default {
 
     // sent to the client
     serialize(value) {
-      isDate(value);
-      return moment(value).toJSON();
+      let result = '';
+      if (typeof value === 'string') {
+        isDate(value);
+        result = moment(value).toJSON();
+      } else {
+        result = value.toDate();
+      }
+      return result;
     },
 
     parseLiteral(ast) {
