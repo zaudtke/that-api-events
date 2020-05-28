@@ -39,7 +39,8 @@ const event = dbInstance => {
     dlog('findAll');
     const colSnapshot = dbInstance
       .doc(`${collectionName}/${eventId}`)
-      .collection(subCollectionName);
+      .collection(subCollectionName)
+      .orderBy('dueDate', 'asc');
 
     let result = null;
     const { size, docs } = await colSnapshot.get();
