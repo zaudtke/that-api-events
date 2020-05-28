@@ -36,7 +36,7 @@ type Event @key(fields: "id") {
   "Website"
   website: URL
 
-  "List of this event's milestones"
+  "List of this event's milestones in ascending chronilogical order"
   milestones: [Milestone]
 
   "List of this event's notifications"
