@@ -30,6 +30,8 @@ function partnerCollection(dbInstance) {
       'SCOUT',
       'CUB',
       'PATRON',
+      'CORPORATE_PARTNER',
+      'PARTNER',
       'PLATINUM',
       'GOLD',
       'SILVER',

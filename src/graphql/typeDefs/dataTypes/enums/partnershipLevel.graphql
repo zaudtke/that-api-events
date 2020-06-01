@@ -4,6 +4,8 @@ enum PartnershipLevel {
   SCOUT
   CUB
   PATRON
+  CORPORATE_PARTNER
+  PARTNER
   MEDIA
   PLATINUM @deprecated(reason: "no longer a partnership level offered.")
   GOLD @deprecated(reason: "no longer a partnership level offered.")
