@@ -44,5 +44,9 @@ export const fieldResolvers = {
 
       return sessionStore(firestore).findAllApprovedByEventId(id);
     },
+    session: ({ id }, { slug }, { dataSources: { firestore } }) => {
+      dlog('session');
+      return sessionStore(firestore).findApprovedBySlug(id, slug);
+    },
   },
 };
