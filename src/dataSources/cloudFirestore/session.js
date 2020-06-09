@@ -47,7 +47,7 @@ const session = dbInstance => {
           slug,
           duplicate_count: docSnap.size,
         });
-        Sentry.captureException(new Error('duplicate slugs in event'));
+        Sentry.captureMessage('duplicate slugs in event');
       });
     }
 
