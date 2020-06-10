@@ -68,4 +68,7 @@ type Event @key(fields: "id") {
 
   "Represents the overall color theme for this event"
   theme: EventTheme
+
+  "Type of event"
+  type: EventType
 }

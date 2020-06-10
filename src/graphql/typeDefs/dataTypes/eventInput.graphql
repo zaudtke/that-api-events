@@ -49,6 +49,9 @@ input EventCreateInput {
 
   "Represents the overall color theme for this event"
   theme: EventThemeCreateInput
+
+  "Type of event"
+  type: EventType
 }
 
 input EventUpdateInput {
@@ -102,4 +105,7 @@ input EventUpdateInput {
 
   "Represents the overall color theme for this event"
   theme: EventThemeUpdateInput
+
+  "Type of event"
+  type: EventType
 }
