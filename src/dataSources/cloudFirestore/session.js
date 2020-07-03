@@ -24,6 +24,27 @@ const session = dbInstance => {
     return results;
   }
 
+  async function findApprovedById(eventId, sessionId) {
+    dlog('findApprovedById');
+
+    const docRef = dbInstance.doc(`${collectionName}/${sessionId}`);
+    const doc = await docRef.get();
+    const currentSession = doc.data();
+
+    if (
+      currentSession.eventId === eventId &&
+      currentSession.status &&
+      ['ACCEPTED', 'SCHEDULED', 'CANCELLED'].includes(currentSession.status)
+    ) {
+      return {
+        id: doc.id,
+        ...currentSession,
+      };
+    }
+
+    return null;
+  }
+
   async function findApprovedBySlug(eventId, slug) {
     dlog('find in event %s by slug %s', eventId, slug);
     const docSnap = await sessionsCollections
@@ -33,7 +54,7 @@ const session = dbInstance => {
       .get();
 
     let result = null;
-
+    dlog('snap size', docSnap.size);
     if (docSnap.size === 1) {
       result = docSnap.docs[0].data();
       result.id = docSnap.docs[0].id;
@@ -54,7 +75,7 @@ const session = dbInstance => {
     return result;
   }
 
-  return { findAllApprovedByEventId, findApprovedBySlug };
+  return { findAllApprovedByEventId, findApprovedBySlug, findApprovedById };
 };
 
 export default session;

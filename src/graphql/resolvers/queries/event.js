@@ -19,6 +19,18 @@ export const fieldResolvers = {
       dlog('EventQuery.partners');
       return { eventId };
     },
+    sessionById: (
+      { eventId },
+      { sessionId },
+      { dataSources: { firestore } },
+    ) => {
+      dlog('EventQuery sessionById called');
+      return sessionStore(firestore).findApprovedById(eventId, sessionId);
+    },
+    sessionBySlug: ({ eventId }, { slug }, { dataSources: { firestore } }) => {
+      dlog('EventQuery sessionBySlug called');
+      return sessionStore(firestore).findApprovedBySlug(eventId, slug);
+    },
   },
   Event: {
     notifications: notificationResolver.notifications,
@@ -43,10 +55,6 @@ export const fieldResolvers = {
       dlog('sessions');
 
       return sessionStore(firestore).findAllApprovedByEventId(id);
-    },
-    session: ({ id }, { slug }, { dataSources: { firestore } }) => {
-      dlog('session');
-      return sessionStore(firestore).findApprovedBySlug(id, slug);
     },
   },
 };
