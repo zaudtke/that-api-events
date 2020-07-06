@@ -15,6 +15,7 @@ const session = dbInstance => {
     const { docs } = await sessionsCollections
       .where('eventId', '==', eventId)
       .where('status', 'in', ['ACCEPTED', 'SCHEDULED', 'CANCELLED'])
+      .orderBy('startTime')
       .get();
 
     const results = docs.map(d => ({
