@@ -40,11 +40,7 @@ function partnerCollection(dbInstance) {
     ];
 
     const sortedResults = _.sortBy(results, [
-      customSort.stringSort({
-        data: results,
-        sortBy,
-        sortField: 'level',
-      }),
+      item => sortBy.indexOf(item.level),
       'placement',
     ]);
 
