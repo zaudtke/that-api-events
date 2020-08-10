@@ -6,9 +6,19 @@ const dlog = debug('that:api:events:query');
 
 export const fieldResolvers = {
   EventsQuery: {
-    all: (_, __, { dataSources: { firestore } }) => {
-      dlog('EventsQuery.all');
-      return eventStore(firestore).getAll();
+    all: (_, { type }, { dataSources: { firestore } }) => {
+      dlog('EventsQuery.all', type);
+      // return eventStore(firestore).getAll();
+      let dataSource;
+      if (type) {
+        dlog('by event type');
+        dataSource = eventStore(firestore).getAllByType(type);
+      } else {
+        dlog('all events');
+        dataSource = eventStore(firestore).getAll();
+      }
+
+      return dataSource;
     },
     event: (_, { id }) => {
       dlog('EventsQuery.event');

@@ -1,5 +1,5 @@
 type EventsQuery {
-  all: [Event]
+  all(type: EventType): [Event]
   event(id: ID!): EventQuery
   eventBySlug(slug: String!): Event
 }
