@@ -51,10 +51,18 @@ export const fieldResolvers = {
           })),
         );
     },
-    sessions: ({ id }, __, { dataSources: { firestore } }) => {
+    sessions: (
+      { id },
+      { onOrAfter, daysAfter },
+      { dataSources: { firestore } },
+    ) => {
       dlog('sessions');
 
-      return sessionStore(firestore).findAllApprovedByEventId(id);
+      return sessionStore(firestore).findAllApprovedByEventIdAtDate(
+        id,
+        onOrAfter,
+        daysAfter,
+      );
     },
   },
 };

@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/node';
 const dlog = debug('that:api:events:datasources:firebase:sessions');
 
 const collectionName = 'sessions';
+const approvedSessionStatuses = ['ACCEPTED', 'SCHEDULED', 'CANCELLED'];
 
 const session = dbInstance => {
   dlog('instance created');
@@ -14,7 +15,7 @@ const session = dbInstance => {
     dlog('findAll');
     const { docs } = await sessionsCollections
       .where('eventId', '==', eventId)
-      .where('status', 'in', ['ACCEPTED', 'SCHEDULED', 'CANCELLED'])
+      .where('status', 'in', approvedSessionStatuses)
       .orderBy('startTime')
       .get();
 
@@ -23,6 +24,34 @@ const session = dbInstance => {
     }));
 
     return results;
+  }
+
+  async function findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter) {
+    dlog(
+      'findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter)',
+      eventId,
+      atDate,
+      daysAfter,
+    );
+    let query = sessionsCollections
+      .where('eventId', '==', eventId)
+      .where('status', 'in', approvedSessionStatuses);
+
+    if (atDate) {
+      const fromdate = new Date(atDate);
+      query = query.where('startTime', '>=', fromdate);
+
+      if (daysAfter) {
+        // 24 * 60 * 60 * 1000 === 86400000
+        const todate = new Date(fromdate.getTime() + daysAfter * 86400000);
+        dlog('todate', todate);
+        query = query.where('startTime', '<=', todate);
+      }
+    }
+
+    const { docs } = await query.orderBy('startTime').get();
+
+    return docs.map(s => ({ id: s.id }));
   }
 
   async function findApprovedById(eventId, sessionId) {
@@ -35,7 +64,7 @@ const session = dbInstance => {
     if (
       currentSession.eventId === eventId &&
       currentSession.status &&
-      ['ACCEPTED', 'SCHEDULED', 'CANCELLED'].includes(currentSession.status)
+      approvedSessionStatuses.includes(currentSession.status)
     ) {
       return {
         id: doc.id,
@@ -50,7 +79,7 @@ const session = dbInstance => {
     dlog('find in event %s by slug %s', eventId, slug);
     const docSnap = await sessionsCollections
       .where('eventId', '==', eventId)
-      .where('status', 'in', ['ACCEPTED', 'SCHEDULED', 'CANCELLED'])
+      .where('status', 'in', approvedSessionStatuses)
       .where('slug', '==', slug)
       .get();
 
@@ -76,7 +105,12 @@ const session = dbInstance => {
     return result;
   }
 
-  return { findAllApprovedByEventId, findApprovedBySlug, findApprovedById };
+  return {
+    findAllApprovedByEventId,
+    findAllApprovedByEventIdAtDate,
+    findApprovedById,
+    findApprovedBySlug,
+  };
 };
 
 export default session;

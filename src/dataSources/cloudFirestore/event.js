@@ -71,6 +71,16 @@ const event = dbInstance => {
     return results;
   };
 
+  const getAllByType = async type => {
+    dlog('getAllByType', type);
+    const { docs } = await eventsCol.where('type', '==', type).get();
+
+    return docs.map(ev => ({
+      id: ev.id,
+      ...ev.data(),
+    }));
+  };
+
   const update = async (id, eventInput) => {
     dlog('update id: %s', id);
     const scrubbedEvent = eventInput;
@@ -91,7 +101,7 @@ const event = dbInstance => {
     return docRef.update(eventInput).then(() => get(id));
   };
 
-  return { create, getAll, get, findBySlug, update };
+  return { create, getAll, getAllByType, get, findBySlug, update };
 };
 
 export default event;
