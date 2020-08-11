@@ -39,7 +39,7 @@ const session = dbInstance => {
 
     if (atDate) {
       const fromdate = new Date(atDate);
-      query = query.where('startTime', '>=', atDate);
+      query = query.where('startTime', '>=', fromdate);
 
       if (daysAfter) {
         // 24 * 60 * 60 * 1000 === 86400000
