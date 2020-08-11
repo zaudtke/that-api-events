@@ -3,7 +3,7 @@ extend type Partner @key(fields: "id") {
 
   placement: Int!
 
-  "physical location of a partners booth"
+  "physical location of a partners booth. Access through Event query ONLY!"
   location: String
 
   "sponsorship level. Access through Event query ONLY!"
