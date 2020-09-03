@@ -61,7 +61,11 @@ export const fieldResolvers = {
         totalEvents: allEvents.length,
       };
     },
-    sendDigest: async ({ name }, { hours }, { dataSources: { firestore } }) => {
+    sendDigest: async (
+      { name },
+      { hours, start },
+      { dataSources: { firestore } },
+    ) => {
       dlog('sendDialog called for %s, hours: %s', name, hours);
       if (!hours) throw new Error('hours parameter required');
       if (hours < 1) throw new Error('hours minimum value is 1');
@@ -69,9 +73,21 @@ export const fieldResolvers = {
       const activeEvents = await communityStore(firestore).findIsActiveEvents(
         name,
       );
+      let digestStart = 'CURRENT_HOUR';
+      if (start) digestStart = start;
 
+      let atDate;
       // Date as of now min, sec, ms set to zero
-      const atDate = new Date(new Date(Date.now()).setMinutes(0, 0, 0));
+      if (digestStart === 'CURRENT_HOUR') {
+        atDate = new Date(new Date(Date.now()).setMinutes(0, 0, 0));
+      } else if (digestStart === 'NEXT_HOUR') {
+        // now + 1 hour (3600000 ms)
+        atDate = new Date(
+          new Date(Date.now()).setMinutes(0, 0, 0) + 60 * 60 * 1000,
+        );
+      } else {
+        throw new Error(`Unknown value sent for 'start': ${digestStart}`);
+      }
       const hoursAfter = hours || 0;
       const sessionFuncs = activeEvents.map(ev =>
         sessionStore(firestore).findAllApprovedByEventIdAtDateHours(

@@ -32,7 +32,10 @@ const divider = {
 export default function digestNextHours({ sessions, hours }) {
   dlog('call digest for next hours, %d', hours);
 
-  const hourText = hours > 1 ? 'hours' : 'hour';
+  const hourText =
+    hours > 1
+      ? `Activities in the Next ${hours} Hours`
+      : 'Activities Coming in the Next Hour';
   const basePost = {
     channel: envConfig.sessionNotifSlackChannel,
     username: 'THAT.us Activity Bot',
@@ -42,7 +45,7 @@ export default function digestNextHours({ sessions, hours }) {
         type: 'header',
         text: {
           type: 'plain_text',
-          text: `:calendar:  Activities in the Next ${hours} ${hourText}  :calendar:`,
+          text: `:calendar:  ${hourText}  :calendar:`,
           emoji: true,
         },
       },
