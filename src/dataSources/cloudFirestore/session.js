@@ -62,7 +62,7 @@ const session = dbInstance => {
     hoursAfter,
   ) {
     dlog(
-      'findAllApprovedByEventIdAtDate(eventId, atDate, hoursAfter)',
+      'findAllApprovedByEventIdAtDateHours(eventId, atDate, hoursAfter)',
       eventId,
       atDate,
       hoursAfter,

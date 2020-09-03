@@ -51,16 +51,18 @@ export const fieldResolvers = {
           })),
         );
     },
-    sessions: (
+    sessions: async (
       { id },
       { onOrAfter, daysAfter },
       { dataSources: { firestore } },
     ) => {
       dlog('sessions');
 
-      return sessionStore(firestore)
-        .findAllApprovedByEventIdAtDate(id, onOrAfter, daysAfter)
-        .map(s => s.id);
+      const result = await sessionStore(
+        firestore,
+      ).findAllApprovedByEventIdAtDate(id, onOrAfter, daysAfter);
+
+      return result.map(d => ({ id: d.id }));
     },
   },
 };

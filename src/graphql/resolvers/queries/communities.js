@@ -42,7 +42,7 @@ export const fieldResolvers = {
       allSessions.forEach(all => {
         localStats.totalActivities += 1;
         localStats.totalDuration += all.durationInMinutes || 30;
-        if (all.startTime.toDate() < today) {
+        if (all.startTime < today) {
           localStats.pastActivities += 1;
           localStats.pastDuration += all.durationInMinutes || 30;
         } else {
@@ -85,7 +85,8 @@ export const fieldResolvers = {
       sessionRefs.forEach(s => sessions.push(...s));
       if (sessions.length > 0) {
         slackDigest({ sessions, hours: hoursAfter });
-        return sessions;
+
+        return sessions.map(s => ({ id: s.id }));
       }
       return null;
     },
