@@ -23,9 +23,7 @@ export const fieldResolvers = {
       // get sessions for events
       // calculate numbers
 
-      const allEvents = await communityStore(firestore).findIsActiveEvents(
-        name,
-      );
+      const allEvents = await communityStore(firestore).findAllEvents(name);
       const sessions = await sessionStore(
         firestore,
       ).findAllAcceptedByEventIdBatch(allEvents.map(e => e.id));
