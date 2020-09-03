@@ -1,7 +1,9 @@
 import debug from 'debug';
 import * as Sentry from '@sentry/node';
+import { utility } from '@thatconference/api';
 
 const dlog = debug('that:api:events:datasources:firebase:sessions');
+const sessionDateForge = utility.firestoreDateForge.sessions;
 
 const collectionName = 'sessions';
 const approvedSessionStatuses = ['ACCEPTED', 'SCHEDULED', 'CANCELLED'];
@@ -19,9 +21,10 @@ const session = dbInstance => {
       .orderBy('startTime')
       .get();
 
-    const results = docs.map(d => ({
-      id: d.id,
-    }));
+    const results = docs.map(s => {
+      const out = { id: s.id, ...s.data() };
+      return sessionDateForge(out);
+    });
 
     return results;
   }
@@ -35,10 +38,10 @@ const session = dbInstance => {
       .select('eventId', 'durationInMinutes', 'startTime')
       .get();
 
-    const results = docs.map(d => ({
-      id: d.id,
-      ...d.data(),
-    }));
+    const results = docs.map(s => {
+      const out = { id: s.id, ...s.data() };
+      return sessionDateForge(out);
+    });
 
     return results;
   }
@@ -53,12 +56,16 @@ const session = dbInstance => {
     return Promise.all(sessRefs);
   }
 
-  async function findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter) {
+  async function findAllApprovedByEventIdAtDateHours(
+    eventId,
+    atDate,
+    hoursAfter,
+  ) {
     dlog(
-      'findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter)',
+      'findAllApprovedByEventIdAtDate(eventId, atDate, hoursAfter)',
       eventId,
       atDate,
-      daysAfter,
+      hoursAfter,
     );
     let query = sessionsCollections
       .where('eventId', '==', eventId)
@@ -68,9 +75,9 @@ const session = dbInstance => {
       const fromdate = new Date(atDate);
       query = query.where('startTime', '>=', fromdate);
 
-      if (daysAfter) {
-        // 24 * 60 * 60 * 1000 === 86400000
-        const todate = new Date(fromdate.getTime() + daysAfter * 86400000);
+      if (hoursAfter && hoursAfter > 0) {
+        // 60 * 60 * 1000 = 3,600,000
+        const todate = new Date(fromdate.getTime() + hoursAfter * 3600000);
         dlog('todate', todate);
         query = query.where('startTime', '<=', todate);
       }
@@ -78,7 +85,23 @@ const session = dbInstance => {
 
     const { docs } = await query.orderBy('startTime').get();
 
-    return docs.map(s => ({ id: s.id }));
+    const results = docs.map(s => {
+      const out = { id: s.id, ...s.data() };
+      return sessionDateForge(out);
+    });
+
+    return results;
+  }
+
+  function findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter) {
+    dlog(
+      'findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter)',
+      eventId,
+      atDate,
+      daysAfter,
+    );
+    const hoursAfter = daysAfter ? daysAfter * 24 : 0;
+    return findAllApprovedByEventIdAtDateHours(eventId, atDate, hoursAfter);
   }
 
   async function findApprovedById(eventId, sessionId) {
@@ -88,18 +111,20 @@ const session = dbInstance => {
     const doc = await docRef.get();
     const currentSession = doc.data();
 
+    let result = null;
     if (
       currentSession.eventId === eventId &&
       currentSession.status &&
       approvedSessionStatuses.includes(currentSession.status)
     ) {
-      return {
+      result = {
         id: doc.id,
         ...currentSession,
       };
+      result = sessionDateForge(result);
     }
 
-    return null;
+    return result;
   }
 
   async function findApprovedBySlug(eventId, slug) {
@@ -129,13 +154,14 @@ const session = dbInstance => {
       });
     }
 
-    return result;
+    return sessionDateForge(result);
   }
 
   return {
     findAllApprovedByEventId,
     findAllAcceptedByEventId,
     findAllAcceptedByEventIdBatch,
+    findAllApprovedByEventIdAtDateHours,
     findAllApprovedByEventIdAtDate,
     findApprovedById,
     findApprovedBySlug,

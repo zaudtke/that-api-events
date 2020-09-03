@@ -3,6 +3,7 @@ import debug from 'debug';
 import communityStore from '../../../dataSources/cloudFirestore/commumity';
 import sessionStore from '../../../dataSources/cloudFirestore/session';
 import memberStore from '../../../dataSources/cloudFirestore/members';
+import slackDigest from '../../../lib/slack/slackDigest';
 
 const dlog = debug('that:api:comunities:query');
 
@@ -22,7 +23,9 @@ export const fieldResolvers = {
       // get sessions for events
       // calculate numbers
 
-      const allEvents = await communityStore(firestore).findAllEvents(name);
+      const allEvents = await communityStore(firestore).findIsActiveEvents(
+        name,
+      );
       const sessions = await sessionStore(
         firestore,
       ).findAllAcceptedByEventIdBatch(allEvents.map(e => e.id));
@@ -59,6 +62,34 @@ export const fieldResolvers = {
         minutesServed: localStats.pastDuration,
         totalEvents: allEvents.length,
       };
+    },
+    sendDigest: async ({ name }, { hours }, { dataSources: { firestore } }) => {
+      dlog('sendDialog called for %s, hours: %s', name, hours);
+      if (!hours) throw new Error('hours parameter required');
+      if (hours < 1) throw new Error('hours minimum value is 1');
+      if (hours > 168) throw new Error('hours maximum value is 168');
+      const activeEvents = await communityStore(firestore).findIsActiveEvents(
+        name,
+      );
+
+      // Date as of now min, sec, ms set to zero
+      const atDate = new Date(new Date(Date.now()).setMinutes(0, 0, 0));
+      const hoursAfter = hours || 0;
+      const sessionFuncs = activeEvents.map(ev =>
+        sessionStore(firestore).findAllApprovedByEventIdAtDateHours(
+          ev.id,
+          atDate,
+          hoursAfter,
+        ),
+      );
+      const sessionRefs = await Promise.all(sessionFuncs);
+      const sessions = [];
+      sessionRefs.forEach(s => sessions.push(...s));
+      if (sessions.length > 0) {
+        slackDigest({ sessions, hours: hoursAfter });
+        return sessions;
+      }
+      return null;
     },
   },
 };

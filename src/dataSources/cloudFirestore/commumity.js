@@ -83,7 +83,12 @@ const community = dbInstance => {
     return isActive;
   }
 
-  return { findActiveEvents, findAllEvents };
+  return {
+    findActiveEvents,
+    findIsActiveEvents,
+    findIsFeaturedEvents,
+    findAllEvents,
+  };
 };
 
 export default community;
