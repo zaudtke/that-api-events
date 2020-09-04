@@ -79,12 +79,10 @@ export const fieldResolvers = {
       let atDate;
       // Date as of now min, sec, ms set to zero
       if (digestStart === 'CURRENT_HOUR') {
-        atDate = new Date(new Date(Date.now()).setMinutes(0, 0, 0));
+        atDate = new Date(new Date().setMinutes(0, 0, 0));
       } else if (digestStart === 'NEXT_HOUR') {
         // now + 1 hour (3600000 ms)
-        atDate = new Date(
-          new Date(Date.now()).setMinutes(0, 0, 0) + 60 * 60 * 1000,
-        );
+        atDate = new Date(new Date().setMinutes(0, 0, 0) + 3600000);
       } else {
         throw new Error(`Unknown value sent for 'start': ${digestStart}`);
       }
