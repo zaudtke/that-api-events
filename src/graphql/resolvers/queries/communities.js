@@ -3,6 +3,7 @@ import debug from 'debug';
 import communityStore from '../../../dataSources/cloudFirestore/commumity';
 import sessionStore from '../../../dataSources/cloudFirestore/session';
 import memberStore from '../../../dataSources/cloudFirestore/members';
+import slackDigest from '../../../lib/slack/slackDigest';
 
 const dlog = debug('that:api:comunities:query');
 
@@ -41,7 +42,7 @@ export const fieldResolvers = {
       allSessions.forEach(all => {
         localStats.totalActivities += 1;
         localStats.totalDuration += all.durationInMinutes || 30;
-        if (all.startTime.toDate() < today) {
+        if (all.startTime < today) {
           localStats.pastActivities += 1;
           localStats.pastDuration += all.durationInMinutes || 30;
         } else {
@@ -59,6 +60,49 @@ export const fieldResolvers = {
         minutesServed: localStats.pastDuration,
         totalEvents: allEvents.length,
       };
+    },
+    sendDigest: async (
+      { name },
+      { hours, start },
+      { dataSources: { firestore } },
+    ) => {
+      dlog('sendDialog called for %s, hours: %s', name, hours);
+      if (!hours) throw new Error('hours parameter required');
+      if (hours < 1) throw new Error('hours minimum value is 1');
+      if (hours > 168) throw new Error('hours maximum value is 168');
+      const activeEvents = await communityStore(firestore).findIsActiveEvents(
+        name,
+      );
+      let digestStart = 'CURRENT_HOUR';
+      if (start) digestStart = start;
+
+      let atDate;
+      // Date as of now min, sec, ms set to zero
+      if (digestStart === 'CURRENT_HOUR') {
+        atDate = new Date(new Date().setMinutes(0, 0, 0));
+      } else if (digestStart === 'NEXT_HOUR') {
+        // now + 1 hour (3600000 ms)
+        atDate = new Date(new Date().setMinutes(0, 0, 0) + 3600000);
+      } else {
+        throw new Error(`Unknown value sent for 'start': ${digestStart}`);
+      }
+      const hoursAfter = hours || 0;
+      const sessionFuncs = activeEvents.map(ev =>
+        sessionStore(firestore).findAllApprovedByEventIdAtDateHours(
+          ev.id,
+          atDate,
+          hoursAfter,
+        ),
+      );
+      const sessionRefs = await Promise.all(sessionFuncs);
+      const sessions = [];
+      sessionRefs.forEach(s => sessions.push(...s));
+      if (sessions.length > 0) {
+        slackDigest({ sessions, hours: hoursAfter });
+
+        return sessions.map(s => ({ id: s.id }));
+      }
+      return null;
     },
   },
 };

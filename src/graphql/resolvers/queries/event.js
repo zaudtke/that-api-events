@@ -58,11 +58,9 @@ export const fieldResolvers = {
     ) => {
       dlog('sessions');
 
-      return sessionStore(firestore).findAllApprovedByEventIdAtDate(
-        id,
-        onOrAfter,
-        daysAfter,
-      );
+      return sessionStore(firestore)
+        .findAllApprovedByEventIdAtDate(id, onOrAfter, daysAfter)
+        .then(s => s.map(d => ({ id: d.id })));
     },
   },
 };

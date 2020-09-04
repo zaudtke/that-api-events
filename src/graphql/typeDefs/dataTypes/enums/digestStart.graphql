@@ -1,0 +1,4 @@
+enum DigestStart {
+  CURRENT_HOUR
+  NEXT_HOUR
+}
