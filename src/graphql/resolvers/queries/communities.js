@@ -64,9 +64,10 @@ export const fieldResolvers = {
     sendDigest: async (
       { name },
       { hours, start },
-      { dataSources: { firestore } },
+      { dataSources: { firestore }, user },
     ) => {
       dlog('sendDialog called for %s, hours: %s', name, hours);
+      if (!user) return null;
       if (!hours) throw new Error('hours parameter required');
       if (hours < 1) throw new Error('hours minimum value is 1');
       if (hours > 168) throw new Error('hours maximum value is 168');
