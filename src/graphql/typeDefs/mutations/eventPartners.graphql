@@ -1,3 +1,0 @@
-type EventPartnersMutation {
-  partner(partnerId: ID!): EventPartnerMutation @auth(requires: "events")
-}
