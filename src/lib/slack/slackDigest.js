@@ -20,7 +20,7 @@ function createActivityCard(session) {
         text: ':that-blue: Details',
         emoji: true,
       },
-      url: `https://that.us/sessions/${session.id}`,
+      url: `https://that.us/activities/${session.id}`,
     },
   };
 }
