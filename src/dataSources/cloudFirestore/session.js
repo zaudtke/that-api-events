@@ -11,27 +11,23 @@ const approvedSessionStatuses = ['ACCEPTED', 'SCHEDULED', 'CANCELLED'];
 const session = dbInstance => {
   dlog('instance created');
 
-  const sessionsCollections = dbInstance.collection(collectionName);
+  const sessionsCollection = dbInstance.collection(collectionName);
 
   async function findAllApprovedByEventId(eventId) {
     dlog('findAll');
-    const { docs } = await sessionsCollections
+    const { docs } = await sessionsCollection
       .where('eventId', '==', eventId)
       .where('status', 'in', approvedSessionStatuses)
+      .select()
       .orderBy('startTime')
       .get();
 
-    const results = docs.map(s => {
-      const out = { id: s.id, ...s.data() };
-      return sessionDateForge(out);
-    });
-
-    return results;
+    return docs.map(s => ({ id: s.id }));
   }
 
   async function findAllAcceptedByEventId(eventId) {
     dlog('findAll accpepted');
-    const { docs } = await sessionsCollections
+    const { docs } = await sessionsCollection
       .where('eventId', '==', eventId)
       .where('status', '==', 'ACCEPTED')
       .orderBy('startTime')
@@ -46,9 +42,9 @@ const session = dbInstance => {
     return results;
   }
 
-  async function findAllAcceptedByEventIdBatch(eventIds) {
+  function findAllAcceptedByEventIdBatch(eventIds) {
     dlog('findAll accpeted batch, %o', eventIds);
-    if (!eventIds.length) {
+    if (!Array.isArray(eventIds)) {
       dlog('eventIds must be and array!!');
       return null;
     }
@@ -67,7 +63,7 @@ const session = dbInstance => {
       atDate,
       hoursAfter,
     );
-    let query = sessionsCollections
+    let query = sessionsCollection
       .where('eventId', '==', eventId)
       .where('status', 'in', approvedSessionStatuses);
 
@@ -88,6 +84,7 @@ const session = dbInstance => {
       }
     }
 
+    // Keeping with data as used by digest
     const { docs } = await query.orderBy('startTime').get();
 
     const results = docs.map(s => {
@@ -124,9 +121,7 @@ const session = dbInstance => {
     ) {
       result = {
         id: doc.id,
-        ...currentSession,
       };
-      result = sessionDateForge(result);
     }
 
     return result;
@@ -134,17 +129,19 @@ const session = dbInstance => {
 
   async function findApprovedBySlug(eventId, slug) {
     dlog('find in event %s by slug %s', eventId, slug);
-    const docSnap = await sessionsCollections
+    const docSnap = await sessionsCollection
       .where('eventId', '==', eventId)
       .where('status', 'in', approvedSessionStatuses)
       .where('slug', '==', slug)
+      .select()
       .get();
 
     let result = null;
     dlog('snap size', docSnap.size);
     if (docSnap.size === 1) {
-      result = docSnap.docs[0].data();
-      result.id = docSnap.docs[0].id;
+      result = {
+        id: docSnap.docs[0].id,
+      };
     } else if (docSnap.size > 0) {
       dlog(`Multple sessions return for event ${eventId}, with slug ${slug}`);
       Sentry.withScope(scope => {
@@ -159,7 +156,107 @@ const session = dbInstance => {
       });
     }
 
-    return sessionDateForge(result);
+    return result;
+  }
+
+  function validateStatuses(statuses) {
+    dlog('validateStatuses %o', statuses);
+    if (!Array.isArray(statuses) || statuses.length === 0) {
+      throw new Error('statuses must be in the form of an array with a value.');
+    }
+    const inStatus = statuses;
+    const isidx = inStatus.indexOf('APPROVED');
+    if (isidx >= 0) {
+      inStatus.splice(isidx, 1);
+      inStatus.push(...approvedSessionStatuses);
+    }
+    if (inStatus > 10)
+      throw new Error(
+        `A maximum of 10 statuses may be queried for. ${statuses}`,
+      );
+
+    dlog('statuses valdated %o', inStatus);
+    return inStatus;
+  }
+
+  async function findByCommunityWithStatuses({
+    communitySlug,
+    statuses,
+    orderBy,
+    pagesize,
+    startAfter,
+  }) {
+    dlog('findByCommunityWithStatuses %s, %o', communitySlug, statuses);
+    const slimslug = communitySlug.trim().toLowerCase();
+    const inStatus = validateStatuses(statuses);
+    let startTimeOrder = 'asc';
+    if (orderBy === 'START_TIME_DESC') startTimeOrder = 'desc';
+    const truePSize = Math.min(pagesize || 20, 100); // max page: 100
+    let query = sessionsCollection
+      .where('communities', 'array-contains', slimslug)
+      .where('status', 'in', inStatus)
+      .orderBy('startTime', startTimeOrder)
+      .orderBy('createdAt', 'asc')
+      .limit(truePSize)
+      .select('startTime', 'createdAt');
+
+    if (startAfter) {
+      // validate cursor
+      const curObject = Buffer.from(startAfter, 'base64').toString('utf8');
+      const { curStartTime, curCreatedAt } = JSON.parse(curObject);
+      dlog('decoded cursor:%s, %s, %s', curObject, curStartTime, curCreatedAt);
+      if (!curStartTime || !curCreatedAt) return null; // invlid cursor
+
+      query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
+    }
+
+    const { size, docs } = await query.get();
+    dlog('query returned %d documents', size);
+
+    const sessions = docs.map(s => ({ id: s.id, ...s.data() }));
+    const lastDoc = sessions[sessions.length - 1];
+    let cursor = '';
+    if (lastDoc) {
+      const cpieces = JSON.stringify({
+        curStartTime: lastDoc.startTime.toMillis(),
+        curCreatedAt: lastDoc.createdAt.toMillis(),
+      });
+      cursor = Buffer.from(cpieces, 'utf8').toString('base64');
+    }
+
+    return {
+      cursor,
+      sessions,
+    };
+  }
+
+  async function findByEventIdWithStatuses(eventId, statuses) {
+    dlog('findByEventIdWithStatus %s %o', eventId, statuses);
+    const inStatus = validateStatuses(statuses);
+    const { docs } = await sessionsCollection
+      .where('eventId', '==', eventId)
+      .where('status', 'in', inStatus)
+      .get();
+
+    const results = docs.map(s => {
+      const out = { id: s.id, ...s.data() };
+      return sessionDateForge(out);
+    });
+
+    return results;
+  }
+
+  function findByEventIdWithStatusesBatch(eventIds, statuses) {
+    dlog('findByEventIdWithStatusBatch %o %o', eventIds, statuses);
+    if (!Array.isArray(eventIds) || eventIds.length === 0)
+      throw new Error('eventIds must be an array with a value.');
+    if (!Array.isArray(statuses) || statuses.length === 0) {
+      throw new Error('statuses must be in the form of an array with a value.');
+    }
+    const sessionFuncs = eventIds.map(e =>
+      findByEventIdWithStatuses(e, statuses),
+    );
+    return Promise.all(sessionFuncs);
   }
 
   return {
@@ -170,6 +267,9 @@ const session = dbInstance => {
     findAllApprovedByEventIdAtDate,
     findApprovedById,
     findApprovedBySlug,
+    findByCommunityWithStatuses,
+    findByEventIdWithStatuses,
+    findByEventIdWithStatusesBatch,
   };
 };
 

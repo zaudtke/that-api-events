@@ -1,0 +1,61 @@
+type Community @key(fields: "id") {
+  id: ID!
+
+  "Community's name"
+  name: String!
+
+  "unique community slug."
+  slug: Slug!
+
+  "The @ name for this community, e.g. @that"
+  handle: String!
+
+  "Community Short Description"
+  description: String
+
+  "A detailed description of Community"
+  aboutUs: String
+
+  "This communities logo"
+  logo: URL
+
+  "Date and time community created"
+  createdAt: Date
+
+  "Date and time when the community was last updated"
+  lastUpdatedAt: Date
+
+  "Events associated with this community. Default filter, ALL"
+  events(filter: CommunityEventsFilter): [Event]
+
+  # Current status of community, ACTIVE, DRAFT, VERIFY
+  status: CommunityStatus
+
+  # A verified community, E.g. Microsoft official .NET team
+  isVerified: Boolean
+
+  # Members following community
+  followers: [PublicProfile]
+
+  # Community moderators
+  moderators: [PublicProfile]
+
+  # member who created community
+  createdBy: PublicProfile
+
+  # member who last updated community
+  lastUpdatedBy: PublicProfile
+
+  tags: [String!]
+
+  "Any community sessions. Defaults: status: [APPROVED], orderBy: START_TIME_ASC, pageSize: 20. DOES NOT RETURN SESSIONS WITHOUT STARTTIME"
+  sessions(
+    status: [SessionStatus]
+    orderBy: SessionOrderBy
+    pageSize: Int
+    startAfter: String
+  ): PagedAcceptedSession
+
+  # get's moved to notifications api
+  #sessionsDigest(hours: Int!, start: DigestStart): [AcceptedSession]
+}

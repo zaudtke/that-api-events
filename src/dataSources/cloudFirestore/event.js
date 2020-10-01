@@ -53,10 +53,13 @@ const event = dbInstance => {
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
     const doc = await docRef.get();
 
-    return {
+    let result = {
       id: doc.id,
       ...doc.data(),
     };
+    if (!result.name) result = null;
+
+    return result;
   };
 
   const getAll = async () => {
@@ -101,7 +104,74 @@ const event = dbInstance => {
     return docRef.update(eventInput).then(() => get(id));
   };
 
-  return { create, getAll, getAllByType, get, findBySlug, update };
+  const findActiveByCommunitySlug = async slug => {
+    const slimslug = slug.trim().toLowerCase();
+    dlog('findActiveByCommunitySlug %s', slimslug);
+    const { docs } = await eventsCol
+      .where('isActive', '==', true)
+      .where('community', '==', slimslug)
+      .where('endDate', '>=', new Date())
+      .get();
+
+    return docs.map(e => ({
+      id: e.id,
+      ...e.data(),
+    }));
+  };
+
+  const findFeaturedByCommunitySlug = async slug => {
+    const slimslug = slug.trim().toLowerCase();
+    dlog('findFeaturedByCommunitySlug %s', slimslug);
+    const { docs } = await eventsCol
+      .where('isActive', '==', true)
+      .where('isFeatured', '==', true)
+      .where('community', '==', slimslug)
+      .where('endDate', '>=', new Date())
+      .get();
+
+    return docs.map(e => ({
+      id: e.id,
+      ...e.data(),
+    }));
+  };
+
+  const findAllByCommunitySlug = async slug => {
+    const slimslug = slug.trim().toLowerCase();
+    dlog('findAllByCommunitySlug %s', slimslug);
+    const { docs } = await eventsCol.where('community', '==', slimslug).get();
+
+    return docs.map(e => ({
+      id: e.id,
+      ...e.data(),
+    }));
+  };
+
+  const findPastByCommunitySlug = async slug => {
+    const slimslug = slug.trim().toLowerCase();
+    dlog('findAllByCommunitySlug %s', slimslug);
+    const { docs } = await eventsCol
+      .where('community', '==', slimslug)
+      .where('endDate', '<', new Date())
+      .get();
+
+    return docs.map(e => ({
+      id: e.id,
+      ...e.data(),
+    }));
+  };
+
+  return {
+    create,
+    getAll,
+    getAllByType,
+    get,
+    findBySlug,
+    update,
+    findActiveByCommunitySlug,
+    findFeaturedByCommunitySlug,
+    findAllByCommunitySlug,
+    findPastByCommunitySlug,
+  };
 };
 
 export default event;

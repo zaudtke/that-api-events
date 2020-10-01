@@ -54,13 +54,13 @@ type Event @key(fields: "id") {
   "is call for speakers open or not"
   isCallForSpeakersOpen: Boolean
 
-  "Will this event show in the list of events for a comunity. Active or not active"
+  "Will this event show in the list of events for a community. Must also be Active to show as a 'FEATURED' event"
   isFeatured: Boolean
 
-  "This event is Active. It has current activities happening"
+  "This event is in an Active state. It is not in a draft state."
   isActive: Boolean
 
-  "The community this Event is part of"
+  "The community this Event is part of. Community.slug"
   community: String!
 
   "Represents the overall color theme for this event"

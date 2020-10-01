@@ -1,0 +1,13 @@
+"Filter the types of events to return for the community"
+enum CommunityEventsFilter {
+  "Everything"
+  ALL
+  "Active events only, have isActive bit true"
+  ACTIVE
+  "Featured events, by definition are also active"
+  FEATURED
+  "Events happening in the future, greater than Now"
+  FUTURE
+  "Events which have already happened, end date less than Now"
+  PAST
+}

@@ -1,14 +1,45 @@
 import debug from 'debug';
 
-import communityStore from '../../../dataSources/cloudFirestore/commumity';
-import sessionStore from '../../../dataSources/cloudFirestore/session';
-import memberStore from '../../../dataSources/cloudFirestore/members';
-import slackDigest from '../../../lib/slack/slackDigest';
+import communityStore from '../../../dataSources/cloudFirestore/community';
 
 const dlog = debug('that:api:comunities:query');
 
 export const fieldResolvers = {
   CommunitiesQuery: {
+    // Returns all communities in data store
+    all: (_, __, { dataSources: { firestore } }) => {
+      dlog('all called');
+
+      return communityStore(firestore).getAll();
+    },
+
+    // return community with mathing id
+    community: (_, { input }, { dataSources: { firestore } }) => {
+      dlog('community (by id)called %s', input);
+      if (!input.slug && !input.id)
+        throw new Error(
+          'community querty requires an id or slug. Neither provided',
+        );
+      if (input.slug && !input.id) {
+        dlog('community by slug');
+        return communityStore(firestore)
+          .findIdFromSlug(input.slug)
+          .then(d => ({ communityId: d ? d.id : null }));
+      }
+      dlog('community by id');
+      return { communityId: input.id };
+    },
+
+    // // Return community with matching slug
+    // communityBySlug: (_, { slug }, { dataSources: { firestore } }) => {
+    //   dlog('communityBySlug called, %s', slug);
+
+    //   return communityStore(firestore)
+    //     .findIdFromSlug(slug)
+    //     .then(d => ({ communityId: d ? d.id : null }));
+    // },
+
+    /*
     active: ({ name }, __, { dataSources: { firestore } }) => {
       dlog('active');
       return communityStore(firestore).findActiveEvents(name);
@@ -104,5 +135,6 @@ export const fieldResolvers = {
       }
       return null;
     },
+    */
   },
 };
