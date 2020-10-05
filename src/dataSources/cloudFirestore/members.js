@@ -13,7 +13,7 @@ const member = dbInstance => {
     dlog('total member count');
     return membersCollection
       .where('isDeactivated', '==', false)
-      .select('firstName')
+      .select()
       .get()
       .then(snap => snap.size);
   }

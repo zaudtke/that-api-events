@@ -3,6 +3,8 @@ import debug from 'debug';
 import communityStore from '../../../dataSources/cloudFirestore/community';
 import eventStore from '../../../dataSources/cloudFirestore/event';
 import sessionStore from '../../../dataSources/cloudFirestore/session';
+import memberStore from '../../../dataSources/cloudFirestore/members';
+import slackDigest from '../../../lib/slack/slackDigest';
 
 const dlog = debug('that:api:community:query');
 
@@ -16,10 +18,93 @@ export const fieldResolvers = {
       return communityStore(firestore).get(communityId);
     },
 
-    stats: ({ communityId }, __, { dataSources: { firestore } }) => {
-      dlog('stats called %s', communityId);
-      if (!communityId) return null;
-      throw new Error('Not implemented yet');
+    stats: async ({ slug }, __, { dataSources: { firestore } }) => {
+      dlog('stats called %s', slug);
+      if (!slug) return [];
+
+      const allEvents = await eventStore(firestore).findAllByCommunitySlug(
+        slug,
+      );
+      const sessions = await sessionStore(
+        firestore,
+      ).findAllAcceptedByEventIdBatch(allEvents.map(e => e.id));
+      const allSessions = [];
+      sessions.forEach(s => allSessions.push(...s));
+      const localStats = {
+        totalActivities: 0,
+        pastActivities: 0,
+        futureActivities: 0,
+        totalDuration: 0,
+        pastDuration: 0,
+        futureDuration: 0,
+      };
+      const today = new Date();
+      allSessions.forEach(all => {
+        localStats.totalActivities += 1;
+        localStats.totalDuration += all.durationInMinutes || 30;
+        if (all.startTime < today) {
+          localStats.pastActivities += 1;
+          localStats.pastDuration += all.durationInMinutes || 30;
+        } else {
+          localStats.futureActivities += 1;
+          localStats.futureDuration += all.durationInMinutes || 30;
+        }
+      });
+      const totalMembers = await memberStore(firestore).getMemberTotal();
+      return {
+        totalMembers,
+        totalActivities: localStats.totalActivities,
+        pastActivities: localStats.pastActivities,
+        upcomingActivities: localStats.futureActivities,
+        hoursServed: Math.floor(localStats.pastDuration / 60),
+        minutesServed: localStats.pastDuration,
+        totalEvents: allEvents.length,
+      };
+    },
+
+    sendDigest: async (
+      { slug },
+      { hours, start },
+      { dataSources: { firestore } },
+    ) => {
+      dlog('sendDialog called for %s, hours: %s', slug, hours);
+      // throw new Error('Not implemented yet');
+      if (hours < 1) throw new Error('hours minimum value is 1');
+      if (hours > 168) throw new Error('hours maximum value is 168');
+      const activeEvents = await eventStore(
+        firestore,
+      ).findActiveByCommunitySlug(slug);
+      let digestStart = 'CURRENT_HOUR';
+      if (start) digestStart = start;
+
+      let atDate;
+      // Date as of now min, sec, ms set to zero
+      if (digestStart === 'CURRENT_HOUR') {
+        atDate = new Date(new Date().setMinutes(0, 0, 0));
+      } else if (digestStart === 'NEXT_HOUR') {
+        // now + 1 hour (3600000 ms)
+        atDate = new Date(new Date().setMinutes(0, 0, 0) + 3600000);
+      } else {
+        throw new Error(`Unknown value sent for 'start': ${digestStart}`);
+      }
+      const hoursAfter = hours || 1;
+      const sessionFuncs = activeEvents.map(ev =>
+        sessionStore(firestore).findAllApprovedActiveByEventIdAtDateHours(
+          ev.id,
+          atDate,
+          hoursAfter,
+        ),
+      );
+      const sessionRefs = await Promise.all(sessionFuncs);
+      const sessions = [];
+      sessionRefs.forEach(s => sessions.push(...s));
+      let result = [];
+      if (sessions.length > 0) {
+        slackDigest({ sessions, hours: hoursAfter });
+
+        result = sessions.map(s => ({ id: s.id }));
+      }
+      return result;
     },
   },
   Community: {

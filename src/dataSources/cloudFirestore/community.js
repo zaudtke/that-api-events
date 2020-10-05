@@ -35,6 +35,19 @@ const community = dbInstance => {
     return result;
   }
 
+  async function getSlug(id) {
+    dlog('find slug from id %s', id);
+    const doc = await dbInstance.doc(`${communityColName}/${id}`).get();
+
+    let result = {
+      id: doc.id,
+      slug: doc.get('slug'),
+    };
+    if (!result.slug) result = null;
+
+    return result;
+  }
+
   async function findIdFromSlug(slug) {
     dlog('findIdFromSlug %s', slug);
 
@@ -82,6 +95,7 @@ const community = dbInstance => {
     return result;
   }
 
+  /* moved to event
   async function findActiveEvents(name) {
     const slimname = name.trim().toLowerCase();
     dlog('allActiveEvents for community: %s', slimname);
@@ -101,7 +115,9 @@ const community = dbInstance => {
 
     return result;
   }
+  */
 
+  /* moved to event
   async function findIsFeaturedEvents(name) {
     dlog('findFeaturedEvents');
     const slimname = name.trim().toLowerCase();
@@ -121,7 +137,9 @@ const community = dbInstance => {
 
     return result;
   }
+  */
 
+  // TODO: Review if still required
   async function findIsActiveEvents(name) {
     dlog('findIsActiveEvents');
     const slimname = name.trim().toLowerCase();
@@ -142,6 +160,7 @@ const community = dbInstance => {
     return result;
   }
 
+  /* moved to event
   async function findAllEvents(name) {
     dlog('findAllEvents');
     // There is no logical OR in FireBase. To acheive this we combine two
@@ -155,16 +174,15 @@ const community = dbInstance => {
 
     return isActive;
   }
+  */
 
   return {
     getAll,
     get,
+    getSlug,
     findIdFromSlug,
     findBySlug,
-    findActiveEvents,
     findIsActiveEvents,
-    findIsFeaturedEvents,
-    findAllEvents,
   };
 };
 

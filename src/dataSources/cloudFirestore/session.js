@@ -52,20 +52,20 @@ const session = dbInstance => {
     return Promise.all(sessRefs);
   }
 
-  async function findAllApprovedByEventIdAtDateHours(
+  async function findAllApprovedActiveByEventIdAtDateHours(
     eventId,
     atDate,
     hoursAfter,
   ) {
     dlog(
-      'findAllApprovedByEventIdAtDateHours(eventId, atDate, hoursAfter)',
+      'findAllApprovedActiveByEventIdAtDateHours(eventId, atDate, hoursAfter)',
       eventId,
       atDate,
       hoursAfter,
     );
     let query = sessionsCollection
       .where('eventId', '==', eventId)
-      .where('status', 'in', approvedSessionStatuses);
+      .where('status', 'in', ['ACCEPTED', 'SCHEDULED']);
 
     if (atDate) {
       const fromdate = new Date(atDate);
@@ -79,7 +79,7 @@ const session = dbInstance => {
         const todate = new Date(
           fromdate.getTime() + (hoursAfter * 3600000 - 60000),
         );
-        dlog('todate', todate);
+        dlog('fromdate - todate: %s - %s', fromdate, todate);
         query = query.where('startTime', '<=', todate);
       }
     }
@@ -92,10 +92,11 @@ const session = dbInstance => {
       return sessionDateForge(out);
     });
 
+    dlog('%s event returning %d documents', eventId, results.length);
     return results;
   }
 
-  function findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter) {
+  function findAllApprovedActiveByEventIdAtDate(eventId, atDate, daysAfter) {
     dlog(
       'findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter)',
       eventId,
@@ -103,7 +104,11 @@ const session = dbInstance => {
       daysAfter,
     );
     const hoursAfter = daysAfter ? daysAfter * 24 : 0;
-    return findAllApprovedByEventIdAtDateHours(eventId, atDate, hoursAfter);
+    return findAllApprovedActiveByEventIdAtDateHours(
+      eventId,
+      atDate,
+      hoursAfter,
+    );
   }
 
   async function findApprovedById(eventId, sessionId) {
@@ -205,7 +210,8 @@ const session = dbInstance => {
       const curObject = Buffer.from(startAfter, 'base64').toString('utf8');
       const { curStartTime, curCreatedAt } = JSON.parse(curObject);
       dlog('decoded cursor:%s, %s, %s', curObject, curStartTime, curCreatedAt);
-      if (!curStartTime || !curCreatedAt) return null; // invlid cursor
+      if (!curStartTime || !curCreatedAt)
+        throw new Error('Invalid cursor provided as startAfter value');
 
       query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
     }
@@ -263,8 +269,8 @@ const session = dbInstance => {
     findAllApprovedByEventId,
     findAllAcceptedByEventId,
     findAllAcceptedByEventIdBatch,
-    findAllApprovedByEventIdAtDateHours,
-    findAllApprovedByEventIdAtDate,
+    findAllApprovedActiveByEventIdAtDateHours,
+    findAllApprovedActiveByEventIdAtDate,
     findApprovedById,
     findApprovedBySlug,
     findByCommunityWithStatuses,
