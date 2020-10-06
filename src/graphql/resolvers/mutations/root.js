@@ -1,6 +1,7 @@
 const resolvers = {
-  events: (parent, args) => ({}),
-  venues: (parent, args) => ({}),
+  events: () => ({}),
+  venues: () => ({}),
+  communities: () => ({}),
 };
 
 export default resolvers;

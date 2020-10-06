@@ -1,21 +1,25 @@
 import debug from 'debug';
-
 import communityStore from '../../../dataSources/cloudFirestore/community';
 
-const dlog = debug('that:api:comunities:query');
+const dlog = debug('that:api:communities:mutation');
 
 export const fieldResolvers = {
-  CommunitiesQuery: {
-    // Returns all communities in data store
-    all: (_, __, { dataSources: { firestore } }) => {
-      dlog('all called');
-
-      return communityStore(firestore).getAll();
+  CommunitiesMutation: {
+    create: (_, { community }, { dataSources: { firestore }, user }) => {
+      dlog('create %s', community.slug);
+      return communityStore(firestore).create({
+        newCommunity: community,
+        user,
+      });
     },
 
-    // return community with mathing id
+    delete: (_, __, ___) => {
+      dlog('delete');
+      throw new Error('Not implemented yet.');
+    },
+
     community: (_, { input }, { dataSources: { firestore } }) => {
-      dlog('community top level called %s', input);
+      dlog('community called %s', input);
       if (!input.slug && !input.id)
         throw new Error(
           'community input requires an id or slug. Neither provided',

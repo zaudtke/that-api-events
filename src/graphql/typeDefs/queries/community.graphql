@@ -1,5 +1,5 @@
 type CommunityQuery {
-  "gets the current focused community based on slug provided"
+  "gets the current focused community based on slug/id provided provided"
   get: Community
 
   "Stats on a community including all associated events"

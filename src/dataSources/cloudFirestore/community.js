@@ -5,6 +5,19 @@ const dlog = debug('that:api:events:datasources:firebase:community');
 const communityColName = 'communities';
 const eventColName = 'events';
 
+function scrubCommunity({ community, user, isNew }) {
+  const scrubbedCommunity = community;
+  const rightNow = new Date();
+  if (isNew) {
+    scrubbedCommunity.createdAt = rightNow;
+    scrubbedCommunity.createdBy = user.sub;
+  }
+  scrubbedCommunity.lastUpdatedAt = rightNow;
+  scrubbedCommunity.lastUpdatedBy = user.sub;
+
+  return scrubbedCommunity;
+}
+
 const community = dbInstance => {
   dlog('instance created');
 
@@ -61,12 +74,11 @@ const community = dbInstance => {
     let result = null;
     if (size === 1) {
       const [d] = docs;
-      dlog('return id for slug %s, %s', d.id, slimslug);
       result = {
         id: d.id,
       };
     } else if (size > 1) {
-      throw new Error(`Multiple Community slugs found for slug ${slimslug}`);
+      throw new Error(`Multiple Community records found for slug ${slimslug}`);
     }
 
     dlog('result: %O', result);
@@ -95,94 +107,63 @@ const community = dbInstance => {
     return result;
   }
 
-  /* moved to event
-  async function findActiveEvents(name) {
-    const slimname = name.trim().toLowerCase();
-    dlog('allActiveEvents for community: %s', slimname);
-    const colSnapshot = eventCol
-      .where('isActive', '==', true)
-      .where('isFeatured', '==', true)
-      .where('community', '==', slimname);
+  async function isSlugTaken(slug) {
+    dlog('isSlugTaken? %s', slug);
+    const { size } = await communityCol
+      .where('slug', '==', slug)
+      .select()
+      .get();
 
-    const { size, docs } = await colSnapshot.get();
-    let result = null;
-    if (size > 0) {
-      result = docs.map(d => ({
-        id: d.id,
-        ...d.data(),
-      }));
-    }
-
-    return result;
-  }
-  */
-
-  /* moved to event
-  async function findIsFeaturedEvents(name) {
-    dlog('findFeaturedEvents');
-    const slimname = name.trim().toLowerCase();
-    dlog('allEvents for community: %s', slimname);
-    const colSnapshot = eventCol
-      .where('isFeatured', '==', true)
-      .where('community', '==', slimname);
-
-    const { size, docs } = await colSnapshot.get();
-    let result = null;
-    if (size > 0) {
-      result = docs.map(d => ({
-        id: d.id,
-        ...d.data(),
-      }));
-    }
-
-    return result;
-  }
-  */
-
-  // TODO: Review if still required
-  async function findIsActiveEvents(name) {
-    dlog('findIsActiveEvents');
-    const slimname = name.trim().toLowerCase();
-    dlog('allEvents for community: %s', slimname);
-    const colSnapshot = eventCol
-      .where('isActive', '==', true)
-      .where('community', '==', slimname);
-
-    const { size, docs } = await colSnapshot.get();
-    let result = null;
-    if (size > 0) {
-      result = docs.map(d => ({
-        id: d.id,
-        ...d.data(),
-      }));
-    }
-
-    return result;
+    return size > 0;
   }
 
-  /* moved to event
-  async function findAllEvents(name) {
-    dlog('findAllEvents');
-    // There is no logical OR in FireBase. To acheive this we combine two
-    // queries into one result.
-    const slimname = name.trim().toLowerCase();
-    let isActive = await findIsActiveEvents(slimname);
-    let isFeatured = await findIsFeaturedEvents(slimname);
-    if (isActive === null) isActive = [];
-    if (isFeatured === null) isFeatured = [];
-    isActive.push(...isFeatured);
+  async function create({ newCommunity, user }) {
+    dlog('create new community with slug %s', newCommunity.slug);
+    const slugCheck = await isSlugTaken(newCommunity.slug);
+    if (slugCheck)
+      throw new Error('Slug is already in use. %s', newCommunity.slug);
+    const cleanCommunity = scrubCommunity({
+      community: newCommunity,
+      user,
+      isNew: true,
+    });
+    const newDocRef = await communityCol.add(cleanCommunity);
+    const newDocument = await newDocRef.get();
 
-    return isActive;
+    return {
+      id: newDocument.id,
+      ...newDocument.data(),
+    };
   }
-  */
+
+  async function update({ communityId, modifiedCommunity, user }) {
+    dlog('update community. %s', communityId);
+    const communityDocRef = dbInstance.doc(
+      `${communityColName}/${communityId}`,
+    );
+    const moddedCommunity = scrubCommunity({
+      community: modifiedCommunity,
+      user,
+      isNew: false,
+    });
+
+    await communityDocRef.update(moddedCommunity);
+    const updatedDoc = await communityDocRef.get();
+    return {
+      id: updatedDoc.id,
+      ...updatedDoc.data(),
+    };
+  }
 
   return {
     getAll,
     get,
     getSlug,
+    isSlugTaken,
     findIdFromSlug,
     findBySlug,
-    findIsActiveEvents,
+    create,
+    update,
   };
 };
 

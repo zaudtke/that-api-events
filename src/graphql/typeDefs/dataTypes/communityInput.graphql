@@ -4,10 +4,45 @@ input CommunityQueryInput {
   slug: Slug
 }
 
-# input CommunityCreateInput {
+input CommunityCreateInput {
+  "Community's name"
+  name: String!
 
-# }
+  "unique community slug."
+  slug: Slug!
 
-# input CommunityUpdateInput {
+  "Community Short Description"
+  description: String!
 
-# }
+  "A detailed description of Community"
+  aboutUs: String
+
+  "This communities logo"
+  logo: URL
+
+  "Current status of community, ACTIVE, DRAFT, VERIFY"
+  status: CommunityStatus!
+
+  "Community tags, subjects about them"
+  tags: [String]!
+}
+
+input CommunityUpdateInput {
+  "Community's name"
+  name: String
+
+  "Community Short Description"
+  description: String
+
+  "A detailed description of Community"
+  aboutUs: String
+
+  "This communities logo"
+  logo: URL
+
+  "Current status of community, ACTIVE, DRAFT, VERIFY"
+  status: CommunityStatus
+
+  "Community tags, subjects about them"
+  tags: [String]
+}

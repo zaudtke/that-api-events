@@ -8,6 +8,24 @@ const sessionDateForge = utility.firestoreDateForge.sessions;
 const collectionName = 'sessions';
 const approvedSessionStatuses = ['ACCEPTED', 'SCHEDULED', 'CANCELLED'];
 
+function validateStatuses(statuses) {
+  dlog('validateStatuses %o', statuses);
+  if (!Array.isArray(statuses) || statuses.length === 0) {
+    throw new Error('statuses must be in the form of an array with a value.');
+  }
+  const inStatus = statuses;
+  const isidx = inStatus.indexOf('APPROVED');
+  if (isidx >= 0) {
+    inStatus.splice(isidx, 1);
+    inStatus.push(...approvedSessionStatuses);
+  }
+  if (inStatus > 10)
+    throw new Error(`A maximum of 10 statuses may be queried for. ${statuses}`);
+
+  dlog('statuses valdated %o', inStatus);
+  return inStatus;
+}
+
 const session = dbInstance => {
   dlog('instance created');
 
@@ -164,32 +182,12 @@ const session = dbInstance => {
     return result;
   }
 
-  function validateStatuses(statuses) {
-    dlog('validateStatuses %o', statuses);
-    if (!Array.isArray(statuses) || statuses.length === 0) {
-      throw new Error('statuses must be in the form of an array with a value.');
-    }
-    const inStatus = statuses;
-    const isidx = inStatus.indexOf('APPROVED');
-    if (isidx >= 0) {
-      inStatus.splice(isidx, 1);
-      inStatus.push(...approvedSessionStatuses);
-    }
-    if (inStatus > 10)
-      throw new Error(
-        `A maximum of 10 statuses may be queried for. ${statuses}`,
-      );
-
-    dlog('statuses valdated %o', inStatus);
-    return inStatus;
-  }
-
   async function findByCommunityWithStatuses({
     communitySlug,
     statuses,
     orderBy,
     pagesize,
-    startAfter,
+    cursor,
   }) {
     dlog('findByCommunityWithStatuses %s, %o', communitySlug, statuses);
     const slimslug = communitySlug.trim().toLowerCase();
@@ -205,15 +203,15 @@ const session = dbInstance => {
       .limit(truePSize)
       .select('startTime', 'createdAt');
 
-    if (startAfter) {
+    if (cursor) {
       // validate cursor
-      const curObject = Buffer.from(startAfter, 'base64').toString('utf8');
+      const curObject = Buffer.from(cursor, 'base64').toString('utf8');
       const { curStartTime, curCreatedAt } = JSON.parse(curObject);
       dlog('decoded cursor:%s, %s, %s', curObject, curStartTime, curCreatedAt);
       if (!curStartTime || !curCreatedAt)
-        throw new Error('Invalid cursor provided as startAfter value');
+        throw new Error('Invalid cursor provided as cursor value');
 
-      query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
+      query = query.cursor(new Date(curStartTime), new Date(curCreatedAt));
     }
 
     const { size, docs } = await query.get();
@@ -221,17 +219,17 @@ const session = dbInstance => {
 
     const sessions = docs.map(s => ({ id: s.id, ...s.data() }));
     const lastDoc = sessions[sessions.length - 1];
-    let cursor = '';
+    let newCursor = '';
     if (lastDoc) {
       const cpieces = JSON.stringify({
         curStartTime: lastDoc.startTime.toMillis(),
         curCreatedAt: lastDoc.createdAt.toMillis(),
       });
-      cursor = Buffer.from(cpieces, 'utf8').toString('base64');
+      newCursor = Buffer.from(cpieces, 'utf8').toString('base64');
     }
 
     return {
-      cursor,
+      cursor: newCursor,
       sessions,
     };
   }

@@ -7,8 +7,8 @@ type Community @key(fields: "id") {
   "unique community slug."
   slug: Slug!
 
-  "The @ name for this community, e.g. @that"
-  handle: String!
+  # "The @ name for this community, e.g. @that"
+  # handle: String!
 
   "Community Short Description"
   description: String
@@ -28,34 +28,32 @@ type Community @key(fields: "id") {
   "Events associated with this community. Default filter, ALL"
   events(filter: CommunityEventsFilter): [Event]
 
-  # Current status of community, ACTIVE, DRAFT, VERIFY
+  "Current status of community, ACTIVE, DRAFT, VERIFY"
   status: CommunityStatus
 
-  # A verified community, E.g. Microsoft official .NET team
+  "A verified community, E.g. Microsoft official .NET team"
   isVerified: Boolean
 
-  # Members following community
+  "Members following community"
   followers: [PublicProfile]
 
-  # Community moderators
+  "Community moderators"
   moderators: [PublicProfile]
 
-  # member who created community
+  "member who created community"
   createdBy: PublicProfile
 
-  # member who last updated community
+  "member who last updated community"
   lastUpdatedBy: PublicProfile
 
-  tags: [String!]
+  "Community tags, subjects about them"
+  tags: [String]!
 
-  "Any community sessions. Defaults: status: [APPROVED], orderBy: START_TIME_ASC, pageSize: 20. DOES NOT RETURN SESSIONS WITHOUT STARTTIME"
+  "Any community sessions. Defaults: status: [APPROVED], orderBy: START_TIME_ASC, pageSize: 20 (max: 100). DOES NOT RETURN SESSIONS WITHOUT STARTTIME FIELD"
   sessions(
     status: [SessionStatus]
     orderBy: SessionOrderBy
     pageSize: Int
-    startAfter: String
+    cursor: String
   ): PagedAcceptedSession
-
-  # get's moved to notifications api
-  #sessionsDigest(hours: Int!, start: DigestStart): [AcceptedSession]
 }

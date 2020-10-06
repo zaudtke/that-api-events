@@ -68,7 +68,6 @@ export const fieldResolvers = {
       { dataSources: { firestore } },
     ) => {
       dlog('sendDialog called for %s, hours: %s', slug, hours);
-      // throw new Error('Not implemented yet');
       if (hours < 1) throw new Error('hours minimum value is 1');
       if (hours > 168) throw new Error('hours maximum value is 168');
       const activeEvents = await eventStore(
@@ -107,6 +106,7 @@ export const fieldResolvers = {
       return result;
     },
   },
+
   Community: {
     createdBy: ({ createdBy }) => {
       dlog('createdBy');
@@ -141,13 +141,13 @@ export const fieldResolvers = {
       return eventResults;
     },
 
-    sessions: async (
+    sessions: (
       { slug },
       {
         status = ['APPROVED'],
         orderBy = 'START_TIME_ASC',
         pageSize = 20,
-        startAfter,
+        cursor,
       },
       { dataSources: { firestore } },
     ) => {
@@ -155,7 +155,7 @@ export const fieldResolvers = {
         'sessions called: community %s, page size %d, after %s, orderedBy %s, having statuses %o',
         slug,
         pageSize,
-        startAfter,
+        cursor,
         orderBy,
         status,
       );
@@ -166,7 +166,7 @@ export const fieldResolvers = {
         statuses: status,
         orderBy,
         pageSize,
-        startAfter,
+        cursor,
       });
     },
 
