@@ -1,0 +1,7 @@
+type CommunitiesQuery {
+  "return all communities (not a paged query!)"
+  all: [Community]
+
+  "Individual community queries"
+  community(findBy: CommunityQueryInput!): CommunityQuery
+}

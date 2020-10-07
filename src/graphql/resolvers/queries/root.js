@@ -11,9 +11,9 @@ const resolvers = {
     dlog('root:venues query called');
     return {};
   },
-  communities: (_, { name }) => {
+  communities: () => {
     dlog('root:communities query called');
-    return { name };
+    return {};
   },
 };
 

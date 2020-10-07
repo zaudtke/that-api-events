@@ -1,36 +1,35 @@
 import debug from 'debug';
-
 import communityStore from '../../../dataSources/cloudFirestore/community';
 
-const dlog = debug('that:api:comunities:query');
+const dlog = debug('that:api:communities:mutation');
 
 export const fieldResolvers = {
-  CommunitiesQuery: {
-    // Returns all communities in data store
-    all: (_, __, { dataSources: { firestore } }) => {
-      dlog('all called');
-
-      return communityStore(firestore).getAllActive();
+  CommunitiesMutation: {
+    create: (_, { community }, { dataSources: { firestore }, user }) => {
+      dlog('create %s', community.slug);
+      return communityStore(firestore).create({
+        newCommunity: community,
+        user,
+      });
     },
 
-    // return community with mathing id
-    community: (_, { input }, { dataSources: { firestore } }) => {
-      dlog('community top level called %s', input);
-      if (!input.slug && !input.id)
+    community: (_, { findBy }, { dataSources: { firestore } }) => {
+      dlog('community called %s', findBy);
+      if (!findBy.slug && !findBy.id)
         throw new Error(
-          'community input requires an id or slug. Neither provided',
+          'community findBy requires an id or slug. Neither provided',
         );
 
       let result = null;
-      if (input.slug && !input.id) {
+      if (findBy.slug && !findBy.id) {
         dlog('find community id by slug');
         return communityStore(firestore)
-          .findIdFromSlug(input.slug)
+          .findIdFromSlug(findBy.slug)
           .then(d => {
             if (d) {
               result = {
                 communityId: d.id,
-                slug: input.slug,
+                slug: findBy.slug,
               };
             }
             dlog('slug/id %o', result);
@@ -41,10 +40,10 @@ export const fieldResolvers = {
       // id only or id and slug sent
       // get slug/verify slug-id relationship
       return communityStore(firestore)
-        .getSlug(input.id)
+        .getSlug(findBy.id)
         .then(c => {
-          if (c) {
-            if (input.slug && input.slug !== c.slug)
+          if (c.slug) {
+            if (findBy.slug && findBy.slug !== c.slug)
               throw new Error('Community slug and id provided do not match.');
             result = {
               communityId: c.id,

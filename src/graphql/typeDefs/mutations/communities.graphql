@@ -1,0 +1,9 @@
+type CommunitiesMutation {
+  "Create a new community"
+  create(community: CommunityCreateInput!): Community!
+    @auth(requires: "communities")
+
+  "individual community mutations"
+  community(input: CommunityQueryInput!): CommunityMutation
+    @auth(requires: "communities")
+}

@@ -1,0 +1,4 @@
+type PagedAcceptedSession {
+  cursor: String!
+  sessions: [AcceptedSession]!
+}

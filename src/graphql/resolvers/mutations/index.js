@@ -14,6 +14,9 @@ import { fieldResolvers as venueFields } from './venue';
 
 import { fieldResolvers as eventPartner } from './eventPartner';
 
+import { fieldResolvers as communitiesFields } from './communities';
+import { fieldResolvers as communityFields } from './community';
+
 export default {
   ...rootMutations,
 };
@@ -28,4 +31,6 @@ export const fieldResolvers = {
   ...venuesFields,
   ...venueFields,
   ...eventPartner,
+  ...communitiesFields,
+  ...communityFields,
 };
