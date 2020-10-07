@@ -3,7 +3,6 @@ import debug from 'debug';
 const dlog = debug('that:api:events:datasources:firebase:community');
 
 const communityColName = 'communities';
-const eventColName = 'events';
 
 function scrubCommunity({ community, user, isNew }) {
   const scrubbedCommunity = community;
@@ -22,11 +21,19 @@ const community = dbInstance => {
   dlog('instance created');
 
   const communityCol = dbInstance.collection(communityColName);
-  const eventCol = dbInstance.collection(eventColName);
 
   async function getAll() {
     dlog('getAll');
     const { docs } = await communityCol.get();
+
+    return docs.map(cm => ({
+      id: cm.id,
+      ...cm.data(),
+    }));
+  }
+
+  async function getAllActive() {
+    const { docs } = await communityCol.where('status', '==', 'ACTIVE').get();
 
     return docs.map(cm => ({
       id: cm.id,
@@ -157,6 +164,7 @@ const community = dbInstance => {
 
   return {
     getAll,
+    getAllActive,
     get,
     getSlug,
     isSlugTaken,

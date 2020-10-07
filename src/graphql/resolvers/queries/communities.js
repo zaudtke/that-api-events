@@ -10,7 +10,7 @@ export const fieldResolvers = {
     all: (_, __, { dataSources: { firestore } }) => {
       dlog('all called');
 
-      return communityStore(firestore).getAll();
+      return communityStore(firestore).getAllActive();
     },
 
     // return community with mathing id
