@@ -26,10 +26,15 @@ const venue = dbInstance => {
     dlog('find');
     const doc = await dbInstance.doc(`${collectionName}/${id}`).get();
 
-    return {
-      id: doc.id,
-      ...doc.data(),
-    };
+    let result = null;
+    if (doc.exists) {
+      result = {
+        id: doc.id,
+        ...doc.data(),
+      };
+    }
+
+    return result;
   }
 
   async function findByIds(ids) {

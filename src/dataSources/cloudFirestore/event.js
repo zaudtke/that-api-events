@@ -53,11 +53,13 @@ const event = dbInstance => {
     const docRef = dbInstance.doc(`${collectionName}/${id}`);
     const doc = await docRef.get();
 
-    let result = {
-      id: doc.id,
-      ...doc.data(),
-    };
-    if (!result.name) result = null;
+    let result = null;
+    if (doc.exists) {
+      result = {
+        id: doc.id,
+        ...doc.data(),
+      };
+    }
 
     return result;
   };

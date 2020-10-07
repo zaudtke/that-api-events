@@ -7,17 +7,11 @@ type Community @key(fields: "id") {
   "unique community slug."
   slug: Slug!
 
-  # "The @ name for this community, e.g. @that"
-  # handle: String!
-
-  "Community Short Description"
-  description: String
-
-  "A detailed description of Community"
-  aboutUs: String
+  "This Community's description"
+  description: String!
 
   "This communities logo"
-  logo: URL
+  logo: URL!
 
   "Date and time community created"
   createdAt: Date

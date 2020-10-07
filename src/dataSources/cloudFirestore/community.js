@@ -46,11 +46,13 @@ const community = dbInstance => {
 
     const doc = await dbInstance.doc(`${communityColName}/${id}`).get();
 
-    let result = {
-      id: doc.id,
-      ...doc.data(),
-    };
-    if (!result.name) result = null;
+    let result = null;
+    if (doc.exists) {
+      result = {
+        id: doc.id,
+        ...doc.data(),
+      };
+    }
 
     return result;
   }
@@ -59,11 +61,13 @@ const community = dbInstance => {
     dlog('find slug from id %s', id);
     const doc = await dbInstance.doc(`${communityColName}/${id}`).get();
 
-    let result = {
-      id: doc.id,
-      slug: doc.get('slug'),
-    };
-    if (!result.slug) result = null;
+    let result = null;
+    if (doc.exists) {
+      result = {
+        id: doc.id,
+        slug: doc.get('slug'),
+      };
+    }
 
     return result;
   }

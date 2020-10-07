@@ -8,17 +8,14 @@ input CommunityCreateInput {
   "Community's name"
   name: String!
 
-  "unique community slug."
+  "unique community slug"
   slug: Slug!
 
-  "Community Short Description"
+  "This Community's description"
   description: String!
 
-  "A detailed description of Community"
-  aboutUs: String
-
   "This communities logo"
-  logo: URL
+  logo: URL!
 
   "Current status of community, ACTIVE, DRAFT, VERIFY"
   status: CommunityStatus!

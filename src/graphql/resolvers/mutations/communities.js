@@ -13,28 +13,23 @@ export const fieldResolvers = {
       });
     },
 
-    delete: (_, __, ___) => {
-      dlog('delete');
-      throw new Error('Not implemented yet.');
-    },
-
-    community: (_, { input }, { dataSources: { firestore } }) => {
-      dlog('community called %s', input);
-      if (!input.slug && !input.id)
+    community: (_, { findBy }, { dataSources: { firestore } }) => {
+      dlog('community called %s', findBy);
+      if (!findBy.slug && !findBy.id)
         throw new Error(
-          'community input requires an id or slug. Neither provided',
+          'community findBy requires an id or slug. Neither provided',
         );
 
       let result = null;
-      if (input.slug && !input.id) {
+      if (findBy.slug && !findBy.id) {
         dlog('find community id by slug');
         return communityStore(firestore)
-          .findIdFromSlug(input.slug)
+          .findIdFromSlug(findBy.slug)
           .then(d => {
             if (d) {
               result = {
                 communityId: d.id,
-                slug: input.slug,
+                slug: findBy.slug,
               };
             }
             dlog('slug/id %o', result);
@@ -45,10 +40,10 @@ export const fieldResolvers = {
       // id only or id and slug sent
       // get slug/verify slug-id relationship
       return communityStore(firestore)
-        .getSlug(input.id)
+        .getSlug(findBy.id)
         .then(c => {
-          if (c) {
-            if (input.slug && input.slug !== c.slug)
+          if (c.slug) {
+            if (findBy.slug && findBy.slug !== c.slug)
               throw new Error('Community slug and id provided do not match.');
             result = {
               communityId: c.id,

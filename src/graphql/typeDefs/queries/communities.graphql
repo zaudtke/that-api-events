@@ -3,5 +3,5 @@ type CommunitiesQuery {
   all: [Community]
 
   "Individual community queries"
-  community(input: CommunityQueryInput!): CommunityQuery
+  community(findBy: CommunityQueryInput!): CommunityQuery
 }

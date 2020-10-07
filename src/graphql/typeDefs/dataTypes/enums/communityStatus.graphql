@@ -1,4 +1,13 @@
 enum CommunityStatus {
+  "A currently active community"
   ACTIVE
+
+  "A communitiy which is still being build out"
   DRAFT
+
+  "A non-active community. Keeps community from showing in 'ALL' queries and is not draft"
+  INACTIVE
+
+  "This community is awaiting verification to become ACTIVE"
+  VERIFY
 }

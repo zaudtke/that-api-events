@@ -14,9 +14,9 @@ function validateStatuses(statuses) {
     throw new Error('statuses must be in the form of an array with a value.');
   }
   const inStatus = statuses;
-  const isidx = inStatus.indexOf('APPROVED');
-  if (isidx >= 0) {
-    inStatus.splice(isidx, 1);
+  const isIndex = inStatus.indexOf('APPROVED');
+  if (isIndex >= 0) {
+    inStatus.splice(isIndex, 1);
     inStatus.push(...approvedSessionStatuses);
   }
   if (inStatus > 10)
