@@ -59,7 +59,7 @@ export const fieldResolvers = {
       dlog('sessions');
 
       return sessionStore(firestore)
-        .findAllApprovedByEventIdAtDate(id, onOrAfter, daysAfter)
+        .findAllApprovedActiveByEventIdAtDate(id, onOrAfter, daysAfter)
         .then(s => s.map(d => ({ id: d.id })));
     },
   },

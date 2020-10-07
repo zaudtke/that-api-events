@@ -116,7 +116,7 @@ const session = dbInstance => {
 
   function findAllApprovedActiveByEventIdAtDate(eventId, atDate, daysAfter) {
     dlog(
-      'findAllApprovedByEventIdAtDate(eventId, atDate, daysAfter)',
+      'findAllApprovedActiveByEventIdAtDate(eventId, atDate, daysAfter)',
       eventId,
       atDate,
       daysAfter,
