@@ -4,6 +4,6 @@ type CommunitiesMutation {
     @auth(requires: "communities")
 
   "individual community mutations"
-  community(input: CommunityQueryInput!): CommunityMutation
+  community(findBy: CommunityQueryInput!): CommunityMutation
     @auth(requires: "communities")
 }
