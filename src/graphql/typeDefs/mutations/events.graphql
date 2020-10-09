@@ -1,5 +1,10 @@
 type EventsMutation {
+  "Create a new event"
   create(event: EventCreateInput!): Event! @auth(requires: "events")
+  "Delete an event (not implemented)"
   delete(id: ID!): ID @auth(requires: "events")
+  "Individual event mutations"
   event(id: ID!): EventMutation @auth(requires: "events")
+  "favorite/follow and event"
+  favoriting(id: ID!): EventFavoritingMutation @auth(requires: "members")
 }

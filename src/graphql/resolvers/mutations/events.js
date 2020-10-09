@@ -1,4 +1,7 @@
+import debug from 'debug';
 import eventStore from '../../../dataSources/cloudFirestore/event';
+
+const dlog = debug('that:api:events:mutations');
 
 export const fieldResolvers = {
   EventsMutation: {
@@ -10,5 +13,9 @@ export const fieldResolvers = {
     },
 
     event: (_, { id }) => ({ eventId: id }),
+
+    favoriting: (_, { id }, { dataSources: { firestore } }) => {
+      dlog('favoriting %s', id);
+    },
   },
 };

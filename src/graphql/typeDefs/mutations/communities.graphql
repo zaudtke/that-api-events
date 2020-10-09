@@ -6,4 +6,7 @@ type CommunitiesMutation {
   "individual community mutations"
   community(findBy: CommunityQueryInput!): CommunityMutation
     @auth(requires: "communities")
+
+  "Path to favoriting/following mutation"
+  favoriting(findBy: CommunityQueryInput!): CommunityFavoritingMutation
 }
