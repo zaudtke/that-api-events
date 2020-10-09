@@ -5,6 +5,6 @@ type EventsMutation {
   delete(id: ID!): ID @auth(requires: "events")
   "Individual event mutations"
   event(id: ID!): EventMutation @auth(requires: "events")
-  "favorate/follow and event"
+  "favorite/follow and event"
   favoriting(id: ID!): EventFavoritingMutation @auth(requires: "members")
 }

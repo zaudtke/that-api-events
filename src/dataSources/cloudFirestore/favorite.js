@@ -25,10 +25,40 @@ const favorite = dbInstance => {
       );
     }
 
-    return docs.map(f => ({ id: f.id }));
+    let result = null;
+    const [f] = docs;
+    if (f) result = { id: f.id };
+
+    return result;
   }
 
-  return { findCommunityFavoriteForMember };
+  async function addCommunityFavoriteForMember({ communityId, user }) {
+    dlog('add favorite of %s for member %s', communityId, user.sub);
+    const newFavorite = {
+      memberId: user.sub,
+      favoritedId: {
+        communityId,
+      },
+      createdAt: new Date(),
+    };
+    const newDoc = await favoritesCollection.add(newFavorite);
+
+    return {
+      id: newDoc.id,
+      ...newFavorite,
+    };
+  }
+
+  function removeFavorite(favoriteId) {
+    dlog('remove favorite %s', favoriteId);
+    return favoritesCollection.doc(favoriteId).delete();
+  }
+
+  return {
+    findCommunityFavoriteForMember,
+    addCommunityFavoriteForMember,
+    removeFavorite,
+  };
 };
 
 export default favorite;

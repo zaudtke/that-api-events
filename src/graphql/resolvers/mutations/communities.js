@@ -16,12 +16,12 @@ export const fieldResolvers = {
 
     community: (_, { findBy }, { dataSources: { firestore } }) => {
       dlog('community called %s', findBy);
-      communityFindBy(findBy, firestore);
+      return communityFindBy(findBy, firestore);
     },
 
     favoriting: (_, { findBy }, { dataSources: { firestore } }) => {
       dlog('favoriting');
-      communityFindBy(findBy, firestore);
+      return communityFindBy(findBy, firestore);
     },
   },
 };

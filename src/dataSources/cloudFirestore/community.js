@@ -132,7 +132,6 @@ const community = dbInstance => {
 
   async function create({ newCommunity, user }) {
     dlog('create new community with slug %s', newCommunity.slug);
-    dlog('newCommunity: ', newCommunity);
     const slugCheck = await isSlugTaken(newCommunity.slug);
     if (slugCheck)
       throw new Error('Slug is already in use. %s', newCommunity.slug);
