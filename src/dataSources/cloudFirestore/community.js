@@ -13,6 +13,8 @@ function scrubCommunity({ community, user, isNew }) {
   }
   scrubbedCommunity.lastUpdatedAt = rightNow;
   scrubbedCommunity.lastUpdatedBy = user.sub;
+  if (scrubbedCommunity.logo && scrubbedCommunity.logo.href)
+    scrubbedCommunity.logo = scrubbedCommunity.logo.href;
 
   return scrubbedCommunity;
 }
