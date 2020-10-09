@@ -10,5 +10,7 @@ export const fieldResolvers = {
     },
 
     event: (_, { id }) => ({ eventId: id }),
+
+    favoriting: (_, __, ___) => {},
   },
 };

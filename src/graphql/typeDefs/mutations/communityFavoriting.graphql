@@ -1,0 +1,4 @@
+type CommunityFavoritingMutation {
+  "Toggles a favorite setting on a community for a member"
+  toggle: Community @auth(requires: "members")
+}

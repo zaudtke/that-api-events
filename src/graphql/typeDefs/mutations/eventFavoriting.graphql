@@ -1,0 +1,4 @@
+type EventFavoritingMutation {
+  "Toggles favorite setting on event for current member"
+  toggle: Event @auth(requires: "members")
+}
