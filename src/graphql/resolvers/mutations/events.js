@@ -16,6 +16,7 @@ export const fieldResolvers = {
 
     favoriting: (_, { id }, { dataSources: { firestore } }) => {
       dlog('favoriting %s', id);
+      return { eventId: id };
     },
   },
 };

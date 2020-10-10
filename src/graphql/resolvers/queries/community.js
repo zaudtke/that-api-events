@@ -1,12 +1,14 @@
 import debug from 'debug';
+import { dataSources } from '@thatconference/api';
 
 import communityStore from '../../../dataSources/cloudFirestore/community';
 import eventStore from '../../../dataSources/cloudFirestore/event';
 import sessionStore from '../../../dataSources/cloudFirestore/session';
 import memberStore from '../../../dataSources/cloudFirestore/members';
-import favoriteStore from '../../../dataSources/cloudFirestore/favorite';
 import slackDigest from '../../../lib/slack/slackDigest';
 
+const favoriteStore = dataSources.cloudFirestore.favorites;
+const favoriteType = 'community';
 const dlog = debug('that:api:community:query');
 
 export const fieldResolvers = {
@@ -173,7 +175,10 @@ export const fieldResolvers = {
 
     followCount: ({ id }, __, { dataSources: { firestore } }) => {
       dlog('followCount called');
-      return favoriteStore(firestore).getCommunityFollowCount(id);
+      return favoriteStore(firestore).getFavoriteCount({
+        favoritedId: id,
+        favoriteType,
+      });
     },
 
     followers: (
@@ -182,8 +187,9 @@ export const fieldResolvers = {
       { dataSources: { firestore } },
     ) => {
       dlog('followers called');
-      return favoriteStore(firestore).getCommunityFollowersPaged({
-        communityId: id,
+      return favoriteStore(firestore).getFollowersPaged({
+        favoritedId: id,
+        favoriteType,
         pageSize,
         cursor,
       });
