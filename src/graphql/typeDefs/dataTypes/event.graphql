@@ -68,4 +68,10 @@ type Event @key(fields: "id") {
 
   "Type of event"
   type: EventType
+
+  "Total follow count includes private and public profile favorites"
+  followCount: Int
+
+  "Members with public profile following/favoriting community Defaults: pageSize: 20"
+  followers(pageSize: Int, cursor: String): PagedMember
 }
