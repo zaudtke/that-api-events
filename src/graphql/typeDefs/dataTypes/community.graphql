@@ -28,9 +28,6 @@ type Community @key(fields: "id") {
   "A verified community, E.g. Microsoft official .NET team"
   isVerified: Boolean
 
-  "Members following community"
-  followers: [PublicProfile]
-
   "Community moderators"
   moderators: [PublicProfile]
 
@@ -50,4 +47,10 @@ type Community @key(fields: "id") {
     pageSize: Int
     cursor: String
   ): PagedAcceptedSession
+
+  "Total follow count includes private and public profile favorites"
+  followCount: Int
+
+  "Members with public profile following/favoriting community Defaults: pageSize: 20"
+  followers(pageSize: Int, cursor: String): PagedMember
 }

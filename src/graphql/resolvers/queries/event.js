@@ -1,4 +1,5 @@
 import debug from 'debug';
+import { dataSources } from '@thatconference/api';
 
 import notificationResolver from './notification';
 import venueStore from '../../../dataSources/cloudFirestore/venue';
@@ -7,6 +8,8 @@ import partnerStore from '../../../dataSources/cloudFirestore/partner';
 import sessionStore from '../../../dataSources/cloudFirestore/session';
 import milestoneResolver from './milestone';
 
+const favoriteStore = dataSources.cloudFirestore.favorites;
+const favoriteType = 'event';
 const dlog = debug('that:api:event:query');
 
 export const fieldResolvers = {
@@ -61,6 +64,26 @@ export const fieldResolvers = {
       return sessionStore(firestore)
         .findAllApprovedActiveByEventIdAtDate(id, onOrAfter, daysAfter)
         .then(s => s.map(d => ({ id: d.id })));
+    },
+    followCount: ({ id }, __, { dataSources: { firestore } }) => {
+      dlog('followCount called');
+      return favoriteStore(firestore).getFavoriteCount({
+        favoritedId: id,
+        favoriteType,
+      });
+    },
+    followers: (
+      { id },
+      { pageSize, cursor },
+      { dataSources: { firestore } },
+    ) => {
+      dlog('followers called');
+      return favoriteStore(firestore).getFollowersPaged({
+        favoritedId: id,
+        favoriteType,
+        pageSize,
+        cursor,
+      });
     },
   },
 };
