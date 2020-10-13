@@ -40,13 +40,18 @@ type Community @key(fields: "id") {
   "Community tags, subjects about them"
   tags: [String]!
 
-  "Any community sessions. Defaults: status: [APPROVED], orderBy: START_TIME_ASC, pageSize: 20 (max: 100). DOES NOT RETURN SESSIONS WITHOUT STARTTIME FIELD"
+  "Any community sessions. Defaults: status: [APPROVED], filter: UPCOMING, pageSize: 20 (max: 100). orderBy only valid with filter: ALL (and defaults desc). DOES NOT RETURN SESSIONS WITHOUT STARTTIME FIELD"
   sessions(
     status: [SessionStatus]
     orderBy: SessionOrderBy
+    filter: SessionFilter
+    asOfDate: Date
     pageSize: Int
     cursor: String
   ): PagedAcceptedSession
+
+  "All Sessions for this community. Defaults: filter: ALL"
+  sessionCount(filter: SessionFilter): Int
 
   "Total follow count includes private and public profile favorites"
   followCount: Int

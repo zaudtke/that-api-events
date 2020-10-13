@@ -148,29 +148,53 @@ export const fieldResolvers = {
       { slug },
       {
         status = ['APPROVED'],
-        orderBy = 'START_TIME_ASC',
+        filter = 'UPCOMING',
+        orderBy,
+        asOfDate,
         pageSize = 20,
         cursor,
       },
       { dataSources: { firestore } },
     ) => {
       dlog(
-        'sessions called: community %s, page size %d, after %s, orderedBy %s, having statuses %o',
+        'sessions called: community %s, page size %d, after %s, orderedBy %s, having statuses %o with filter %s',
         slug,
         pageSize,
         cursor,
         orderBy,
         status,
+        filter,
       );
 
       // Get sessions by community slug
       return sessionStore(firestore).findByCommunityWithStatuses({
         communitySlug: slug,
         statuses: status,
+        filter,
+        asOfDate,
         orderBy,
         pageSize,
         cursor,
       });
+    },
+
+    sessionCount: ({ slug }, { filter }, { dataSources: { firestore } }) => {
+      dlog('sessionCount called with filter %s', filter);
+      let countFunc;
+
+      if (filter === 'UPCOMING' || filter === 'PAST') {
+        countFunc = sessionStore(firestore).getCountByCommunitySlugDate({
+          communitySlug: slug,
+          date: new Date(),
+          direction: filter,
+        });
+      } else {
+        countFunc = sessionStore(firestore).getCountByCommunitySlug({
+          communitySlug: slug,
+        });
+      }
+
+      return countFunc;
     },
 
     followCount: ({ id }, __, { dataSources: { firestore } }) => {

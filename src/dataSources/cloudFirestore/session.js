@@ -4,6 +4,7 @@ import { utility } from '@thatconference/api';
 
 const dlog = debug('that:api:events:datasources:firebase:sessions');
 const sessionDateForge = utility.firestoreDateForge.sessions;
+const { dateForge } = utility.firestoreDateForge;
 
 const collectionName = 'sessions';
 const approvedSessionStatuses = ['ACCEPTED', 'SCHEDULED', 'CANCELLED'];
@@ -186,15 +187,25 @@ const session = dbInstance => {
     communitySlug,
     statuses,
     orderBy,
-    pagesize,
+    filter,
+    asOfDate,
+    pageSize,
     cursor,
   }) {
     dlog('findByCommunityWithStatuses %s, %o', communitySlug, statuses);
     const slimslug = communitySlug.trim().toLowerCase();
     const inStatus = validateStatuses(statuses);
+    const truePSize = Math.min(pageSize || 20, 100); // max page: 100
+    let allOrderBy = 'desc';
+    if (orderBy === 'START_TIME_ASC') allOrderBy = 'asc';
+
     let startTimeOrder = 'asc';
-    if (orderBy === 'START_TIME_DESC') startTimeOrder = 'desc';
-    const truePSize = Math.min(pagesize || 20, 100); // max page: 100
+    if (filter === 'PAST') {
+      startTimeOrder = 'desc';
+    } else if (filter === 'ALL') {
+      startTimeOrder = allOrderBy;
+    }
+
     let query = sessionsCollection
       .where('communities', 'array-contains', slimslug)
       .where('status', 'in', inStatus)
@@ -203,17 +214,29 @@ const session = dbInstance => {
       .limit(truePSize)
       .select('startTime', 'createdAt');
 
-    if (cursor) {
-      // validate cursor
+    if (asOfDate && !cursor) {
+      query = query.startAfter(new Date(asOfDate));
+    } else if (cursor) {
       const curObject = Buffer.from(cursor, 'base64').toString('utf8');
-      const { curStartTime, curCreatedAt } = JSON.parse(curObject);
+      const {
+        curStartTime,
+        curCreatedAt,
+        curCommunitySlug,
+        curFilter,
+      } = JSON.parse(curObject);
       dlog('decoded cursor:%s, %s, %s', curObject, curStartTime, curCreatedAt);
-      if (!curStartTime || !curCreatedAt)
+      if (
+        !curStartTime ||
+        !curCreatedAt ||
+        curCommunitySlug !== communitySlug ||
+        (curFilter && curFilter !== filter)
+      )
         throw new Error('Invalid cursor provided as cursor value');
 
-      query = query.cursor(new Date(curStartTime), new Date(curCreatedAt));
+      query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
     }
 
+    // query me
     const { size, docs } = await query.get();
     dlog('query returned %d documents', size);
 
@@ -222,8 +245,10 @@ const session = dbInstance => {
     let newCursor = '';
     if (lastDoc) {
       const cpieces = JSON.stringify({
-        curStartTime: lastDoc.startTime.toMillis(),
-        curCreatedAt: lastDoc.createdAt.toMillis(),
+        curStartTime: dateForge(lastDoc.startTime),
+        curCreatedAt: dateForge(lastDoc.createdAt),
+        curCommunitySlug: communitySlug,
+        curFilter: filter,
       });
       newCursor = Buffer.from(cpieces, 'utf8').toString('base64');
     }
@@ -231,7 +256,39 @@ const session = dbInstance => {
     return {
       cursor: newCursor,
       sessions,
+      count: sessions.length,
     };
+  }
+
+  async function getCountByCommunitySlug({ communitySlug }) {
+    dlog('getCountByCommunitySlug %s', communitySlug);
+    const slimslug = communitySlug.trim().toLowerCase();
+    const { size } = await sessionsCollection
+      .where('communities', 'array-contains', slimslug)
+      .where('status', 'in', approvedSessionStatuses)
+      .select()
+      .get();
+
+    return size;
+  }
+
+  async function getCountByCommunitySlugDate({
+    communitySlug,
+    date,
+    direction,
+  }) {
+    dlog('getCountByCommunitySlug %s', communitySlug);
+    const slimslug = communitySlug.trim().toLowerCase();
+    let query = sessionsCollection
+      .where('communities', 'array-contains', slimslug)
+      .where('status', 'in', approvedSessionStatuses);
+
+    if (direction === 'UPCOMING') query = query.where('startTime', '>=', date);
+    if (direction === 'PAST') query = query.where('startTime', '<', date);
+
+    const { size } = await query.select().get();
+
+    return size;
   }
 
   async function findByEventIdWithStatuses(eventId, statuses) {
@@ -272,6 +329,8 @@ const session = dbInstance => {
     findApprovedById,
     findApprovedBySlug,
     findByCommunityWithStatuses,
+    getCountByCommunitySlug,
+    getCountByCommunitySlugDate,
     findByEventIdWithStatuses,
     findByEventIdWithStatusesBatch,
   };
