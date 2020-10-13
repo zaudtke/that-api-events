@@ -4,6 +4,7 @@ import { utility } from '@thatconference/api';
 
 const dlog = debug('that:api:events:datasources:firebase:sessions');
 const sessionDateForge = utility.firestoreDateForge.sessions;
+const { dateForge } = utility.firestoreDateForge;
 
 const collectionName = 'sessions';
 const approvedSessionStatuses = ['ACCEPTED', 'SCHEDULED', 'CANCELLED'];
@@ -186,7 +187,84 @@ const session = dbInstance => {
     communitySlug,
     statuses,
     orderBy,
-    pagesize,
+    filter,
+    asOfDate,
+    pageSize,
+    cursor,
+  }) {
+    dlog('findByCommunityWithStatuses %s, %o', communitySlug, statuses);
+    const slimslug = communitySlug.trim().toLowerCase();
+    const inStatus = validateStatuses(statuses);
+    const truePSize = Math.min(pageSize || 20, 100); // max page: 100
+    let allOrderBy = 'desc';
+    if (orderBy === 'START_TIME_ASC') allOrderBy = 'asc';
+
+    let startTimeOrder = 'asc';
+    if (filter === 'PAST') {
+      startTimeOrder = 'desc';
+    } else if (filter === 'ALL') {
+      startTimeOrder = allOrderBy;
+    }
+
+    let query = sessionsCollection
+      .where('communities', 'array-contains', slimslug)
+      .where('status', 'in', inStatus)
+      .orderBy('startTime', startTimeOrder)
+      .orderBy('createdAt', 'asc')
+      .limit(truePSize)
+      .select('startTime', 'createdAt');
+
+    if (asOfDate && !cursor) {
+      query = query.startAfter(new Date(asOfDate));
+    } else if (cursor) {
+      const curObject = Buffer.from(cursor, 'base64').toString('utf8');
+      const {
+        curStartTime,
+        curCreatedAt,
+        curCommunitySlug,
+        curFilter,
+      } = JSON.parse(curObject);
+      dlog('decoded cursor:%s, %s, %s', curObject, curStartTime, curCreatedAt);
+      if (
+        !curStartTime ||
+        !curCreatedAt ||
+        curCommunitySlug !== communitySlug ||
+        (curFilter && curFilter !== filter)
+      )
+        throw new Error('Invalid cursor provided as cursor value');
+
+      query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
+    }
+
+    // query me
+    const { size, docs } = await query.get();
+    dlog('query returned %d documents', size);
+
+    const sessions = docs.map(s => ({ id: s.id, ...s.data() }));
+    const lastDoc = sessions[sessions.length - 1];
+    let newCursor = '';
+    if (lastDoc) {
+      const cpieces = JSON.stringify({
+        curStartTime: dateForge(lastDoc.startTime),
+        curCreatedAt: dateForge(lastDoc.createdAt),
+        curCommunitySlug: communitySlug,
+        curFilter: filter,
+      });
+      newCursor = Buffer.from(cpieces, 'utf8').toString('base64');
+    }
+
+    return {
+      cursor: newCursor,
+      sessions,
+      count: sessions.length,
+    };
+  }
+
+  async function findByCommunityWithStatuses1({
+    communitySlug,
+    statuses,
+    orderBy,
+    pageSize,
     cursor,
   }) {
     dlog('findByCommunityWithStatuses %s, %o', communitySlug, statuses);
@@ -194,7 +272,7 @@ const session = dbInstance => {
     const inStatus = validateStatuses(statuses);
     let startTimeOrder = 'asc';
     if (orderBy === 'START_TIME_DESC') startTimeOrder = 'desc';
-    const truePSize = Math.min(pagesize || 20, 100); // max page: 100
+    const truePSize = Math.min(pageSize || 20, 100); // max page: 100
     let query = sessionsCollection
       .where('communities', 'array-contains', slimslug)
       .where('status', 'in', inStatus)
@@ -211,7 +289,7 @@ const session = dbInstance => {
       if (!curStartTime || !curCreatedAt)
         throw new Error('Invalid cursor provided as cursor value');
 
-      query = query.cursor(new Date(curStartTime), new Date(curCreatedAt));
+      query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
     }
 
     const { size, docs } = await query.get();
