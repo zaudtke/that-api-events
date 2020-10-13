@@ -56,6 +56,40 @@ export const fieldResolvers = {
     },
     sessions: (
       { id },
+      {
+        status = ['APPROVED'],
+        filter = 'UPCOMING',
+        orderBy,
+        asOfDate,
+        pageSize,
+        cursor,
+      },
+      { dataSources: { firestore } },
+    ) => {
+      dlog(
+        'sessions called: event %s, page size %d, after %s, orderedBy %s, having statuses %o with filter %s',
+        id,
+        pageSize,
+        cursor,
+        orderBy,
+        status,
+        filter,
+      );
+
+      // get sessions by event id
+      return sessionStore(firestore).findByEventIdWithStatuses({
+        eventId: id,
+        statuses: status,
+        filter,
+        asOfDate,
+        orderBy,
+        pageSize,
+        cursor,
+      });
+    },
+
+    sessions1: (
+      { id },
       { onOrAfter, daysAfter },
       { dataSources: { firestore } },
     ) => {

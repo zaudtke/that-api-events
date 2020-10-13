@@ -162,6 +162,44 @@ const event = dbInstance => {
     }));
   };
 
+  async function findIdFromSlug(slug) {
+    dlog('findIdFromSlug %s', slug);
+    const slimslug = slug.trim().toLowerCase();
+    const { size, docs } = await eventsCol
+      .where('slug', '==', slimslug)
+      .select()
+      .get();
+
+    dlog('size: %d', size);
+    let result = null;
+    if (size === 1) {
+      const [e] = docs;
+      result = {
+        id: e.id,
+      };
+    } else if (size > 1) {
+      throw new Error(
+        `Mulitple Event records found for slug ${slimslug} - ${size}`,
+      );
+    }
+
+    return result;
+  }
+
+  async function getSlug(id) {
+    dlog('find slug from id %s', id);
+    const docRef = await eventsCol.doc(id).get();
+    let result = null;
+    if (docRef.exists) {
+      result = {
+        id: docRef.id,
+        slug: docRef.get('slug'),
+      };
+    }
+
+    return result;
+  }
+
   return {
     create,
     getAll,
@@ -173,6 +211,8 @@ const event = dbInstance => {
     findFeaturedByCommunitySlug,
     findAllByCommunitySlug,
     findPastByCommunitySlug,
+    findIdFromSlug,
+    getSlug,
   };
 };
 

@@ -1,3 +1,8 @@
+input EventQueryInput {
+  id: ID
+  slug: String
+}
+
 input EventCreateInput {
   "The event friendly name"
   name: String!
