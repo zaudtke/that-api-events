@@ -1,5 +1,6 @@
 type EventsQuery {
+  "Return all events"
   all(type: EventType): [Event]
-  event(id: ID!): EventQuery
-  eventBySlug(slug: String!): Event
+  "return a specific event using id or slug"
+  event(findBy: EventQueryInput!): EventQuery
 }

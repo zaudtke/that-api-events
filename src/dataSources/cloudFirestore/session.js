@@ -183,6 +183,79 @@ const session = dbInstance => {
     return result;
   }
 
+  async function findByEventIdWithStatuses({
+    eventId,
+    statuses,
+    orderBy,
+    filter,
+    asOfDate,
+    pageSize,
+    cursor,
+  }) {
+    dlog('findByCommunityWithStatuses %s, %o', eventId, statuses);
+    const inStatus = validateStatuses(statuses);
+    const truePSize = Math.min(pageSize || 20, 100); // max page: 100
+    let allOrderBy = 'desc';
+    if (orderBy === 'START_TIME_ASC') allOrderBy = 'asc';
+
+    let startTimeOrder = 'asc';
+    if (filter === 'PAST') {
+      startTimeOrder = 'desc';
+    } else if (filter === 'ALL') {
+      startTimeOrder = allOrderBy;
+    }
+
+    let query = sessionsCollection
+      .where('eventId', '==', eventId)
+      .where('status', 'in', inStatus)
+      .orderBy('startTime', startTimeOrder)
+      .orderBy('createdAt', 'asc')
+      .limit(truePSize)
+      .select('startTime', 'createdAt');
+
+    if (asOfDate && !cursor) {
+      query = query.startAfter(new Date(asOfDate));
+    } else if (cursor) {
+      const curObject = Buffer.from(cursor, 'base64').toString('utf8');
+      const { curStartTime, curCreatedAt, curEventId, curFilter } = JSON.parse(
+        curObject,
+      );
+      dlog('decoded cursor:%s, %s, %s', curObject, curStartTime, curCreatedAt);
+      if (
+        !curStartTime ||
+        !curCreatedAt ||
+        curEventId !== eventId ||
+        (curFilter && curFilter !== filter)
+      )
+        throw new Error('Invalid cursor provided as cursor value');
+
+      query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
+    }
+
+    // query me
+    const { size, docs } = await query.get();
+    dlog('query returned %d documents', size);
+
+    const sessions = docs.map(s => ({ id: s.id, ...s.data() }));
+    const lastDoc = sessions[sessions.length - 1];
+    let newCursor = '';
+    if (lastDoc) {
+      const cpieces = JSON.stringify({
+        curStartTime: dateForge(lastDoc.startTime),
+        curCreatedAt: dateForge(lastDoc.createdAt),
+        curEventId: eventId,
+        curFilter: filter,
+      });
+      newCursor = Buffer.from(cpieces, 'utf8').toString('base64');
+    }
+
+    return {
+      cursor: newCursor,
+      sessions,
+      count: sessions.length,
+    };
+  }
+
   async function findByCommunityWithStatuses({
     communitySlug,
     statuses,
@@ -236,7 +309,6 @@ const session = dbInstance => {
       query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
     }
 
-    // query me
     const { size, docs } = await query.get();
     dlog('query returned %d documents', size);
 
@@ -291,7 +363,7 @@ const session = dbInstance => {
     return size;
   }
 
-  async function findByEventIdWithStatuses(eventId, statuses) {
+  async function findByEventIdWithStatuses1(eventId, statuses) {
     dlog('findByEventIdWithStatus %s %o', eventId, statuses);
     const inStatus = validateStatuses(statuses);
     const { docs } = await sessionsCollection
@@ -307,7 +379,7 @@ const session = dbInstance => {
     return results;
   }
 
-  function findByEventIdWithStatusesBatch(eventIds, statuses) {
+  function findByEventIdWithStatuses1Batch(eventIds, statuses) {
     dlog('findByEventIdWithStatusBatch %o %o', eventIds, statuses);
     if (!Array.isArray(eventIds) || eventIds.length === 0)
       throw new Error('eventIds must be an array with a value.');
@@ -315,7 +387,7 @@ const session = dbInstance => {
       throw new Error('statuses must be in the form of an array with a value.');
     }
     const sessionFuncs = eventIds.map(e =>
-      findByEventIdWithStatuses(e, statuses),
+      findByEventIdWithStatuses1(e, statuses),
     );
     return Promise.all(sessionFuncs);
   }
@@ -332,7 +404,7 @@ const session = dbInstance => {
     getCountByCommunitySlug,
     getCountByCommunitySlugDate,
     findByEventIdWithStatuses,
-    findByEventIdWithStatusesBatch,
+    findByEventIdWithStatuses1Batch,
   };
 };
 

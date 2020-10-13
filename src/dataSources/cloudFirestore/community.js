@@ -77,7 +77,7 @@ const community = dbInstance => {
   async function findIdFromSlug(slug) {
     dlog('findIdFromSlug %s', slug);
 
-    const slimslug = slug.trim();
+    const slimslug = slug.trim().toLowerCase();
     const { size, docs } = await communityCol
       .where('slug', '==', slimslug)
       .select() // no fields selected so returns doc ref with no data :)
