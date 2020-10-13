@@ -260,56 +260,35 @@ const session = dbInstance => {
     };
   }
 
-  async function findByCommunityWithStatuses1({
-    communitySlug,
-    statuses,
-    orderBy,
-    pageSize,
-    cursor,
-  }) {
-    dlog('findByCommunityWithStatuses %s, %o', communitySlug, statuses);
+  async function getCountByCommunitySlug({ communitySlug }) {
+    dlog('getCountByCommunitySlug %s', communitySlug);
     const slimslug = communitySlug.trim().toLowerCase();
-    const inStatus = validateStatuses(statuses);
-    let startTimeOrder = 'asc';
-    if (orderBy === 'START_TIME_DESC') startTimeOrder = 'desc';
-    const truePSize = Math.min(pageSize || 20, 100); // max page: 100
+    const { size } = await sessionsCollection
+      .where('communities', 'array-contains', slimslug)
+      .where('status', 'in', approvedSessionStatuses)
+      .select()
+      .get();
+
+    return size;
+  }
+
+  async function getCountByCommunitySlugDate({
+    communitySlug,
+    date,
+    direction,
+  }) {
+    dlog('getCountByCommunitySlug %s', communitySlug);
+    const slimslug = communitySlug.trim().toLowerCase();
     let query = sessionsCollection
       .where('communities', 'array-contains', slimslug)
-      .where('status', 'in', inStatus)
-      .orderBy('startTime', startTimeOrder)
-      .orderBy('createdAt', 'asc')
-      .limit(truePSize)
-      .select('startTime', 'createdAt');
+      .where('status', 'in', approvedSessionStatuses);
 
-    if (cursor) {
-      // validate cursor
-      const curObject = Buffer.from(cursor, 'base64').toString('utf8');
-      const { curStartTime, curCreatedAt } = JSON.parse(curObject);
-      dlog('decoded cursor:%s, %s, %s', curObject, curStartTime, curCreatedAt);
-      if (!curStartTime || !curCreatedAt)
-        throw new Error('Invalid cursor provided as cursor value');
+    if (direction === 'UPCOMING') query = query.where('startTime', '>=', date);
+    if (direction === 'PAST') query = query.where('startTime', '<', date);
 
-      query = query.startAfter(new Date(curStartTime), new Date(curCreatedAt));
-    }
+    const { size } = await query.select().get();
 
-    const { size, docs } = await query.get();
-    dlog('query returned %d documents', size);
-
-    const sessions = docs.map(s => ({ id: s.id, ...s.data() }));
-    const lastDoc = sessions[sessions.length - 1];
-    let newCursor = '';
-    if (lastDoc) {
-      const cpieces = JSON.stringify({
-        curStartTime: lastDoc.startTime.toMillis(),
-        curCreatedAt: lastDoc.createdAt.toMillis(),
-      });
-      newCursor = Buffer.from(cpieces, 'utf8').toString('base64');
-    }
-
-    return {
-      cursor: newCursor,
-      sessions,
-    };
+    return size;
   }
 
   async function findByEventIdWithStatuses(eventId, statuses) {
@@ -350,6 +329,8 @@ const session = dbInstance => {
     findApprovedById,
     findApprovedBySlug,
     findByCommunityWithStatuses,
+    getCountByCommunitySlug,
+    getCountByCommunitySlugDate,
     findByEventIdWithStatuses,
     findByEventIdWithStatusesBatch,
   };

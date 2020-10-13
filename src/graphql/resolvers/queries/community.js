@@ -178,6 +178,25 @@ export const fieldResolvers = {
       });
     },
 
+    sessionCount: ({ slug }, { filter }, { dataSources: { firestore } }) => {
+      dlog('sessionCount called with filter %s', filter);
+      let countFunc;
+
+      if (filter === 'UPCOMING' || filter === 'PAST') {
+        countFunc = sessionStore(firestore).getCountByCommunitySlugDate({
+          communitySlug: slug,
+          date: new Date(),
+          direction: filter,
+        });
+      } else {
+        countFunc = sessionStore(firestore).getCountByCommunitySlug({
+          communitySlug: slug,
+        });
+      }
+
+      return countFunc;
+    },
+
     followCount: ({ id }, __, { dataSources: { firestore } }) => {
       dlog('followCount called');
       return favoriteStore(firestore).getFavoriteCount({

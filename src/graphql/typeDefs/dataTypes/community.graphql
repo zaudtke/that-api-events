@@ -50,6 +50,9 @@ type Community @key(fields: "id") {
     cursor: String
   ): PagedAcceptedSession
 
+  "All Sessions for this community. Defaults: filter: ALL"
+  sessionCount(filter: SessionFilter): Int
+
   "Total follow count includes private and public profile favorites"
   followCount: Int
 
