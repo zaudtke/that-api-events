@@ -59,6 +59,12 @@ const community = dbInstance => {
     return result;
   }
 
+  function getBatch(ids) {
+    if (!Array.isArray(ids))
+      throw new Error('getBatch must receive an array of ids');
+    return Promise.all(ids.map(id => get(id)));
+  }
+
   async function getSlug(id) {
     dlog('find slug from id %s', id);
     const doc = await dbInstance.doc(`${communityColName}/${id}`).get();
@@ -172,6 +178,7 @@ const community = dbInstance => {
     getAll,
     getAllActive,
     get,
+    getBatch,
     getSlug,
     isSlugTaken,
     findIdFromSlug,

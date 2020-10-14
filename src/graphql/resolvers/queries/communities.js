@@ -3,7 +3,7 @@ import debug from 'debug';
 import communityStore from '../../../dataSources/cloudFirestore/community';
 import communityFindBy from '../../../lib/communityFindby';
 
-const dlog = debug('that:api:comunities:query');
+const dlog = debug('that:api:communities:query');
 
 export const fieldResolvers = {
   CommunitiesQuery: {
@@ -18,6 +18,11 @@ export const fieldResolvers = {
     community: (_, { findBy }, { dataSources: { firestore } }) => {
       dlog('community top level called %s', findBy);
       return communityFindBy(findBy, firestore);
+    },
+
+    me: () => {
+      dlog('me called');
+      return {};
     },
   },
 };

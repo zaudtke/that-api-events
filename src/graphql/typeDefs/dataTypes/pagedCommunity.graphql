@@ -1,0 +1,5 @@
+type PagedCommunity {
+  cursor: String
+  count: Int
+  communities: [Community]
+}

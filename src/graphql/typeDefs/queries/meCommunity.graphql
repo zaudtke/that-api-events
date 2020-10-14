@@ -1,0 +1,4 @@
+type MeCommunityQuery {
+  "Community favorite queries for logged in user"
+  favorites: CommunityFavoritesQuery @auth(requires: "members")
+}

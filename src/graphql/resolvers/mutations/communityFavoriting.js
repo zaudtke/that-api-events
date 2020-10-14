@@ -24,7 +24,8 @@ export const fieldResolvers = {
       if (fav) {
         dlog('favorite exists, removing');
         await favoriteStore(firestore).removeFavorite({
-          favoritedId: fav.id,
+          favoriteId: fav.id,
+          user,
         });
       } else {
         dlog(`favorite doesn't exist, adding`);

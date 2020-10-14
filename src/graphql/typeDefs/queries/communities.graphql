@@ -4,4 +4,7 @@ type CommunitiesQuery {
 
   "Individual community queries"
   community(findBy: CommunityQueryInput!): CommunityQuery
+
+  "Community data in scope of logged in user (me)"
+  me: MeCommunityQuery @auth(requires: "members")
 }
