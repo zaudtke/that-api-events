@@ -1,4 +1,4 @@
 type MeCommunityQuery {
   "Community favorite queries for logged in user"
-  favorites: CommunityFavoritesQuery @auth(requires: "members")
+  favorites: MeCommunityFavoritesQuery @auth(requires: "members")
 }

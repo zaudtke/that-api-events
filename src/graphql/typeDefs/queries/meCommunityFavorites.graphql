@@ -1,4 +1,4 @@
-type CommunityFavoritesQuery {
+type MeCommunityFavoritesQuery {
   "all community id's favorited by logged in member"
   ids: [ID] @auth(requires: "members")
 
