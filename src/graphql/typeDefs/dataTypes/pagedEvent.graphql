@@ -1,8 +1,8 @@
-type PagedCommunity {
+type PagedEvent {
   "Cursor to pass in for more paged results"
   cursor: String
   "Number of records in `this` paged result"
   count: Int
-  "list of  communities in this page"
-  communities: [Community]
+  "list of events in this page"
+  events: [Event]
 }

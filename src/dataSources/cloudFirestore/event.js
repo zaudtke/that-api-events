@@ -48,10 +48,9 @@ const event = dbInstance => {
     };
   };
 
-  const get = async id => {
+  async function get(id) {
     dlog('get');
-    const docRef = dbInstance.doc(`${collectionName}/${id}`);
-    const doc = await docRef.get();
+    const doc = await dbInstance.doc(`${collectionName}/${id}`).get();
 
     let result = null;
     if (doc.exists) {
@@ -62,7 +61,15 @@ const event = dbInstance => {
     }
 
     return result;
-  };
+  }
+
+  async function getBatch(ids) {
+    dlog('getBatch %d', ids.length);
+    if (!Array.isArray(ids))
+      throw new Error('getBatch must receive an array of ids');
+
+    return Promise.all(ids.map(id => get(id)));
+  }
 
   const getAll = async () => {
     dlog('get all');
@@ -205,6 +212,7 @@ const event = dbInstance => {
     getAll,
     getAllByType,
     get,
+    getBatch,
     findBySlug,
     update,
     findActiveByCommunitySlug,

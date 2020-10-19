@@ -3,4 +3,6 @@ type EventsQuery {
   all(type: EventType): [Event]
   "return a specific event using id or slug"
   event(findBy: EventQueryInput!): EventQuery
+  "Event data in scope of logged in memeber (me)"
+  me: MeEventQuery @auth(requires: "members")
 }
