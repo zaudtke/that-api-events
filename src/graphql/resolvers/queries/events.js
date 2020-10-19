@@ -25,5 +25,9 @@ export const fieldResolvers = {
       dlog('EventsQuery.event');
       return eventFindBy(findBy, firestore);
     },
+    me: () => {
+      dlog('me called');
+      return {};
+    },
   },
 };

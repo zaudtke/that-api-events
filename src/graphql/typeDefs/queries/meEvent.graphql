@@ -1,0 +1,4 @@
+type MeEventQuery {
+  "Event favorite queries of logged in user"
+  favorites: MeEventFavoritesQuery @auth(requires: "members")
+}

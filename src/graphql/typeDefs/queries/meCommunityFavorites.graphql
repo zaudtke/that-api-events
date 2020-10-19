@@ -2,7 +2,7 @@ type MeCommunityFavoritesQuery {
   "all community id's favorited by logged in member"
   ids: [ID] @auth(requires: "members")
 
-  "pagged list of communities favorited by logged in member"
+  "paged list of communities favorited by logged in member"
   communities(pageSize: Int, cursor: String): PagedCommunity
     @auth(requires: "members")
 }
